@@ -6,12 +6,22 @@
 #include <set>
 
 Coordinate::Coordinate(Function& function, std::map<std::string, double> const& initializedSymbols)
-    :symbols(initializedSymbols),
-     function(function)
+    :function(function)
 {
-    for(auto const& symbol : initializedSymbols)
+    auto functionSymbols = function.getSymbols();
+
+    for(auto const& symbol : functionSymbols)
     {
-        function.setValue(symbol.first, symbol.second);
+        try
+        {
+            auto initialValue = initializedSymbols.at(symbol);
+            function.setValue(symbol, initialValue);
+            symbols[symbol] = initialValue;
+        }
+        catch(std::out_of_range & exception)
+        {
+            symbols[symbol] = 0.0;
+        }
     }
 
     value = function.calculateExpression();
@@ -25,6 +35,11 @@ Function& Coordinate::getFunction() const
 double Coordinate::getValue() const
 {
     return value;
+}
+
+const std::map<std::string, double>& Coordinate::getSymbols() const
+{
+    return symbols;
 }
 
 Function::Function(std::string const& expression)
@@ -46,6 +61,17 @@ Function::Function(std::string const& expression)
 
     expression_.register_symbol_table(symbol_table_);
     parser_.compile(expression, expression_);
+}
+
+std::set<std::string> Function::getSymbols()
+{
+    std::set<std::string> symbols;
+
+    for(auto const& symbol : uniqueSymbols_)
+    {
+        symbols.insert(symbol.first);
+    }
+    return symbols;
 }
 
 bool Function::setValue(std::string const& symbol, double const& newValue)
@@ -131,26 +157,13 @@ std::size_t numberOfPointsInCircleWithNicheRadius(std::vector<Point> compareSet,
     return numberOfPoints;
 }
 
-std::set<std::string> Algorithm::extractSymbols(Function& function)
-{
-    std::set<std::string> symbols;
-    static std::map<std::string, double> emptySymbols;
-    Coordinate coordinate(function, emptySymbols);
-
-    for(auto const& symbol : coordinate.symbols)
-    {
-        symbols.insert(symbol.first);
-    }
-    return symbols;
-}
-
-std::vector<Point> Algorithm::generatePoints(Function& firstFunction, Function& secondFunction, std::size_t numberOfPoints)
+std::vector<Point> Algorithm::generatePoints(std::size_t numberOfPoints)
 {
     std::vector<Point> points;
     for(std::size_t i = 0; i < numberOfPoints; ++i)
     {
-        auto firstFunctionSymbols = extractSymbols(firstFunction);
-        auto secondFunctionSymbols = extractSymbols(secondFunction);
+        auto firstFunctionSymbols = firstFunction->getSymbols();
+        auto secondFunctionSymbols = secondFunction->getSymbols();
 
         std::set<std::string> functionSymbols;
         for(auto const& symbol : firstFunctionSymbols)
@@ -186,6 +199,8 @@ std::vector<Point> Algorithm::generatePoints(Function& firstFunction, Function& 
                 symbolsForSecondFunction[symbol] = generatedSymbolValue;
             }
         }
+        points.emplace_back(Coordinate(*firstFunction, std::move(symbolsForFirstFunction)),
+                            Coordinate(*secondFunction, std::move(symbolsForSecondFunction)));
     }
 
     return points;
@@ -194,10 +209,10 @@ std::vector<Point> Algorithm::generatePoints(Function& firstFunction, Function& 
 Point Algorithm::crossover(Point const& firstPoint, Point const& secondPoint)
 {
     std::map<std::string, double> newXSymbols;
-    for(auto const& symbol : firstPoint.x.symbols)
+    for(auto const& symbol : firstPoint.x.getSymbols())
     {
         const auto symbolName = symbol.first;
-        auto valueOfXInSecond = secondPoint.x.symbols.at(symbolName);
+        auto valueOfXInSecond = secondPoint.x.getSymbols().at(symbolName);
 
         auto newValue = (symbol.second + valueOfXInSecond)/2;
 
@@ -205,10 +220,10 @@ Point Algorithm::crossover(Point const& firstPoint, Point const& secondPoint)
     }
 
     std::map<std::string, double> newYSymbols;
-    for(auto const& symbol : firstPoint.x.symbols)
+    for(auto const& symbol : firstPoint.x.getSymbols())
     {
         auto& symbolName = symbol.first;
-        auto valueOfYInSecond = secondPoint.x.symbols.at(symbolName);
+        auto valueOfYInSecond = secondPoint.x.getSymbols().at(symbolName);
 
         auto newValue = (symbol.second + valueOfYInSecond)/2;
 
@@ -223,8 +238,8 @@ Point Algorithm::crossover(Point const& firstPoint, Point const& secondPoint)
 
 Point Algorithm::mutate(Point const& point)
 {
-    auto xSymbolsOfBasedPoint = point.x.symbols;
-    auto ySymbolsOfBasedPoint = point.y.symbols;
+    auto xSymbolsOfBasedPoint = point.x.getSymbols();
+    auto ySymbolsOfBasedPoint = point.y.getSymbols();
 
     auto mutateSymbol = [&](auto& setOfSymbols)
     {
@@ -248,8 +263,8 @@ Point Algorithm::mutate(Point const& point)
 
 void Algorithm::startCalculations()
 {
-    Function firstFunction(std::string(ui->function1->text().toUtf8().constData()));
-    Function secondFunction(std::string(ui->function2->text().toUtf8().constData()));
+    firstFunction = std::make_unique<Function>(std::string(ui->function1->text().toUtf8().constData()));
+    secondFunction = std::make_unique<Function>(std::string(ui->function2->text().toUtf8().constData()));
 
     constraints["x1"] = Constraint(1.0, 3.0);
     constraints["x2"] = Constraint(-1.0, 7.0);
@@ -265,7 +280,7 @@ void Algorithm::startCalculations()
 
     auto tdom = 7u;
 
-    std::vector<Point> p0 = generatePoints(firstFunction, secondFunction, N);
+    std::vector<Point> p0 = generatePoints(N);
 
     for (unsigned t = 1; t < T; ++t)
     {
@@ -276,7 +291,7 @@ void Algorithm::startCalculations()
             auto firstPoint = p0[generator.generateInt(0, p0.size() - 1)];
             auto secondPoint = p0[generator.generateInt(0, p0.size() - 1)];
 
-            std::vector<Point> compareSet = generatePoints(firstFunction, secondFunction, tdom);
+            std::vector<Point> compareSet = generatePoints(tdom);
 
             if(not isDominated(compareSet, firstPoint) and isDominated(compareSet, secondPoint))
             {

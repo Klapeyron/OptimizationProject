@@ -7,6 +7,7 @@
 #include <QObject>
 #include <ui_mainwindow.h>
 #include "random.hpp"
+#include <memory>
 
 using symbol_table_t = exprtk::symbol_table<double>;
 using expression_t   = exprtk::expression<double>;
@@ -26,6 +27,7 @@ class Function
 public:
     Function(std::string const& expression);
     bool setValue(std::string const& symbol, double const& newValue);
+    std::set<std::string> getSymbols();
     double calculateExpression();
 };
 
@@ -35,9 +37,9 @@ struct Coordinate
 
     Function& getFunction() const;
     double getValue() const;
-
-    const std::map<std::string, double> symbols;
+    const std::map<std::string, double>& getSymbols() const;
 private:
+    std::map<std::string, double> symbols;
     double value;
     Function& function;
 };
@@ -58,15 +60,16 @@ class Algorithm :public QObject
 {
     Q_OBJECT
 
+    Ui::MainWindow* ui;
+
     std::map<std::string, Constraint> constraints;
     RandomGenerator generator;
-    Ui::MainWindow* ui;
+    std::unique_ptr<Function> firstFunction, secondFunction;
 public:
     Algorithm(Ui::MainWindow* ui) :ui(ui) {}
     virtual ~Algorithm() {};
 
-    std::set<std::string> extractSymbols(Function& function);
-    std::vector<Point> generatePoints(Function& firstFunction, Function& secondFunction, std::size_t numberOfPoints);
+    std::vector<Point> generatePoints(std::size_t numberOfPoints);
 
     Point crossover(Point const& firstPoint, Point const& secondPoint);
     Point mutate(Point const& firstPoint);
