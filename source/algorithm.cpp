@@ -199,8 +199,9 @@ std::vector<Point> Algorithm::generatePoints(std::size_t numberOfPoints)
                 symbolsForSecondFunction[symbol] = generatedSymbolValue;
             }
         }
-        points.emplace_back(Coordinate(*firstFunction, std::move(symbolsForFirstFunction)),
-                            Coordinate(*secondFunction, std::move(symbolsForSecondFunction)));
+        auto generatedPoint = Point(Coordinate(*firstFunction, std::move(symbolsForFirstFunction)),
+                              Coordinate(*secondFunction, std::move(symbolsForSecondFunction)));
+        points.push_back(std::move(generatedPoint));
     }
 
     return points;
@@ -243,7 +244,7 @@ Point Algorithm::mutate(Point const& point)
 
     auto mutateSymbol = [&](auto& setOfSymbols)
     {
-        auto symbolIndex = generator.generateInt(0, setOfSymbols.size());
+        auto symbolIndex = generator.generateInt(0, setOfSymbols.size() - 1);
 
         auto symbolIt = setOfSymbols.begin();
         std::advance(symbolIt, symbolIndex);
@@ -323,11 +324,11 @@ void Algorithm::startCalculations()
         for(std::size_t i = 0; i < std::floor(N/2); i++)
         {
             auto firstPos = generator.generateInt(0, temporarySet.size() - 1);
-            auto firstPoint = p0[firstPos];
+            auto firstPoint = temporarySet[firstPos];
             //   temporarySet.erase(temporarySet.begin() + firstPos);
 
             auto secondPos = generator.generateInt(0, temporarySet.size() - 1);
-            auto secondPoint = p0[secondPos];
+            auto secondPoint = temporarySet[secondPos];
             //   temporarySet.erase(temporarySet.begin() + secondPos);
 
             auto decisionVariable = generator.generateDouble(0,100);
@@ -336,7 +337,7 @@ void Algorithm::startCalculations()
             if(shouldCross)
             {
                 auto newPoint = crossover(firstPoint, secondPoint);
-                crossoverSet.push_back(newPoint);
+                crossoverSet.push_back(std::move(newPoint));
             }
         }
 
@@ -350,7 +351,7 @@ void Algorithm::startCalculations()
             if(shouldMutate)
             {
                 auto newPoint = mutate(crossoverPoint);
-                mutationSet.push_back(newPoint);
+                mutationSet.push_back(std::move(newPoint));
             }
         }
 
