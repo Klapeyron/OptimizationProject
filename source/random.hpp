@@ -10,6 +10,7 @@ class RandomGenerator
 public:
     RandomGenerator();
     double generateDouble(double a, double b);
+    unsigned generateInt(unsigned a, unsigned b);
 };
 
 #endif // RANDOM_HPP
