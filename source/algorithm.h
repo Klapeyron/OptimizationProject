@@ -31,23 +31,21 @@ public:
     double calculateExpression();
 };
 
-struct Coordinate
+class Point
 {
-    Coordinate(Function& function, std::map<std::string, double> const& initializedSymbols);
-
-    Function& getFunction() const;
-    double getValue() const;
+public:
+    Point(Function& firstFunction,
+          Function& secondFunction,
+          std::map<std::string, double> const& symbols);
     const std::map<std::string, double>& getSymbols() const;
+    double getXValue() const;
+    double getYValue() const;
 private:
-    std::map<std::string, double> symbols;
-    double value;
-    Function& function;
-};
+    Function& firstFunction;
+    Function& secondFunction;
 
-struct Point
-{
-    Point(Coordinate const& x, Coordinate const& y) :x(x), y(y) {}
-    const Coordinate x,y;
+    double xValue, yValue;
+    std::map<std::string, double> symbols;
 };
 
 struct Constraint

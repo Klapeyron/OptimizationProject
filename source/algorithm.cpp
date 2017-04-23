@@ -5,39 +5,47 @@
 #include <map>
 #include <set>
 
-Coordinate::Coordinate(Function& function, std::map<std::string, double> const& initializedSymbols)
-    :function(function)
+Point::Point(Function& firstFunction, Function& secondFunction, std::map<std::string, double> const& initialSymbols)
+    :firstFunction(firstFunction),
+     secondFunction(secondFunction)
 {
-    auto functionSymbols = function.getSymbols();
-
-    for(auto const& symbol : functionSymbols)
+    auto applySymbols = [&](Function& function)
     {
-        try
+        auto functionSymbols = function.getSymbols();
+
+        for(auto const& symbol : functionSymbols)
         {
-            auto initialValue = initializedSymbols.at(symbol);
-            function.setValue(symbol, initialValue);
-            symbols[symbol] = initialValue;
+            try
+            {
+                auto initialValue = initialSymbols.at(symbol);
+                function.setValue(symbol, initialValue);
+                symbols[symbol] = initialValue;
+            }
+            catch(std::out_of_range & exception)
+            {
+                symbols[symbol] = 0.0;
+            }
         }
-        catch(std::out_of_range & exception)
-        {
-            symbols[symbol] = 0.0;
-        }
-    }
+    };
 
-    value = function.calculateExpression();
+    applySymbols(firstFunction);
+    applySymbols(secondFunction);
+
+    xValue = firstFunction.calculateExpression();
+    yValue = secondFunction.calculateExpression();
 }
 
-Function& Coordinate::getFunction() const
+double Point::getXValue() const
 {
-    return function;
+    return xValue;
 }
 
-double Coordinate::getValue() const
+double Point::getYValue() const
 {
-    return value;
+    return yValue;
 }
 
-const std::map<std::string, double>& Coordinate::getSymbols() const
+const std::map<std::string, double>& Point::getSymbols() const
 {
     return symbols;
 }
@@ -131,15 +139,14 @@ bool isDominated(std::vector<Point> setOfPoints, Point comparePoint)
 {
     return std::find_if(setOfPoints.begin(), setOfPoints.end(), [&](Point const& pointInCollection)
     {
-        return comparePoint.x.getValue() > pointInCollection.x.getValue() and comparePoint.y.getValue() > pointInCollection.y.getValue();
-
+        return comparePoint.getXValue() > pointInCollection.getXValue() and comparePoint.getYValue() > pointInCollection.getYValue();
     }) != setOfPoints.end();
 }
 
 double norm(Point firstPoint, Point secondPoint)
 {
-    auto xLength = firstPoint.x.getValue() - secondPoint.x.getValue();
-    auto yLength = firstPoint.y.getValue() - secondPoint.y.getValue();
+    auto xLength = firstPoint.getXValue() - secondPoint.getXValue();
+    auto yLength = firstPoint.getYValue() - secondPoint.getYValue();
 
     return std::sqrt(std::pow(xLength, 2) + std::pow(yLength, 2));
 }
@@ -176,8 +183,7 @@ std::vector<Point> Algorithm::generatePoints(std::size_t numberOfPoints)
             functionSymbols.insert(symbol);
         }
 
-        std::map<std::string, double> symbolsForFirstFunction;
-        std::map<std::string, double> symbolsForSecondFunction;
+        std::map<std::string, double> generatedSymbols;
 
         for(auto const& symbol : functionSymbols)
         {
@@ -186,21 +192,9 @@ std::vector<Point> Algorithm::generatePoints(std::size_t numberOfPoints)
 
             auto generatedSymbolValue = generator.generateDouble(min, max);
 
-            bool symbolRequiredByFirstFunction = firstFunctionSymbols.find(symbol) != firstFunctionSymbols.end();
-            bool symbolRequiredBySecondFunction = secondFunctionSymbols.find(symbol) != secondFunctionSymbols.end();
-
-            if(symbolRequiredByFirstFunction)
-            {
-                symbolsForFirstFunction[symbol] = generatedSymbolValue;
-            }
-
-            if(symbolRequiredBySecondFunction)
-            {
-                symbolsForSecondFunction[symbol] = generatedSymbolValue;
-            }
+            generatedSymbols[symbol] = generatedSymbolValue;
         }
-        auto generatedPoint = Point(Coordinate(*firstFunction, std::move(symbolsForFirstFunction)),
-                              Coordinate(*secondFunction, std::move(symbolsForSecondFunction)));
+        auto generatedPoint = Point(*firstFunction, *secondFunction, std::move(generatedSymbols));
         points.push_back(std::move(generatedPoint));
     }
 
@@ -209,57 +203,35 @@ std::vector<Point> Algorithm::generatePoints(std::size_t numberOfPoints)
 
 Point Algorithm::crossover(Point const& firstPoint, Point const& secondPoint)
 {
-    std::map<std::string, double> newXSymbols;
-    for(auto const& symbol : firstPoint.x.getSymbols())
+    std::map<std::string, double> newSymbols;
+
+    for(auto const& symbol : firstPoint.getSymbols())
     {
         const auto symbolName = symbol.first;
-        auto valueOfXInSecond = secondPoint.x.getSymbols().at(symbolName);
+        auto valueOfSymbolInSecond = secondPoint.getSymbols().at(symbolName);
 
-        auto newValue = (symbol.second + valueOfXInSecond)/2;
+        auto newValue = (symbol.second + valueOfSymbolInSecond)/2;
 
-        newXSymbols[symbolName] = newValue;
+        newSymbols[symbolName] = newValue;
+        std::map<std::string, double> newYSymbols;
     }
 
-    std::map<std::string, double> newYSymbols;
-    for(auto const& symbol : firstPoint.x.getSymbols())
-    {
-        auto& symbolName = symbol.first;
-        auto valueOfYInSecond = secondPoint.x.getSymbols().at(symbolName);
-
-        auto newValue = (symbol.second + valueOfYInSecond)/2;
-
-        newYSymbols[symbolName] = newValue;
-    }
-
-    Coordinate coordinateX(firstPoint.x.getFunction(), newXSymbols);
-    Coordinate coordinateY(firstPoint.y.getFunction(), newYSymbols);
-
-    return Point(std::move(coordinateX), std::move(coordinateY));
+    return Point(*firstFunction, *secondFunction, newSymbols);
 }
 
 Point Algorithm::mutate(Point const& point)
 {
-    auto xSymbolsOfBasedPoint = point.x.getSymbols();
-    auto ySymbolsOfBasedPoint = point.y.getSymbols();
+    auto symbolsOfBasedPoint = point.getSymbols();
 
-    auto mutateSymbol = [&](auto& setOfSymbols)
-    {
-        auto symbolIndex = generator.generateInt(0, setOfSymbols.size() - 1);
+    auto symbolIndex = generator.generateInt(0, symbolsOfBasedPoint.size() - 1);
 
-        auto symbolIt = setOfSymbols.begin();
-        std::advance(symbolIt, symbolIndex);
+    auto symbolIt = symbolsOfBasedPoint.begin();
+    std::advance(symbolIt, symbolIndex);
 
-        auto multiplicand = generator.generateDouble(-1, 1);
-        (*symbolIt).second = (*symbolIt).second + (*symbolIt).second * multiplicand;
-    };
+    auto multiplicand = generator.generateDouble(-1, 1);
+    (*symbolIt).second = (*symbolIt).second + (*symbolIt).second * multiplicand;
 
-    mutateSymbol(xSymbolsOfBasedPoint);
-    mutateSymbol(ySymbolsOfBasedPoint);
-
-    Coordinate coordinateX(point.x.getFunction(), xSymbolsOfBasedPoint);
-    Coordinate coordinateY(point.y.getFunction(), ySymbolsOfBasedPoint);
-
-    return Point(std::move(coordinateX), std::move(coordinateY));
+    return Point(*firstFunction, *secondFunction, std::move(symbolsOfBasedPoint));
 }
 
 void Algorithm::startCalculations()
