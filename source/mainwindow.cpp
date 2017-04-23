@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->startButton, SIGNAL(clicked(bool)), &algorithm, SLOT(startCalculations()));
     connect(ui->function1, SIGNAL(editingFinished()), &algorithm, SLOT(putSymbolsToTable()));
     connect(ui->function2, SIGNAL(editingFinished()), &algorithm, SLOT(putSymbolsToTable()));
+    connect(ui->tableWidget, SIGNAL(cellChanged(int,int)), &algorithm, SLOT(updateConstraints(int,int)));
 }
 
 MainWindow::~MainWindow()

@@ -96,41 +96,57 @@ double Function::calculateExpression()
     return expression_.value();
 }
 
+void Algorithm::updateConstraints(int row, int column)
+{
+    auto symbol = std::string(ui->tableWidget->item(row, 0)->text().toUtf8().constData());
+    if(column == 1) // min value changed
+    {
+        constraints[symbol].min = std::stod(std::string(ui->tableWidget->item(row, 1)->text().toUtf8().constData()));
+    }
+    else if(column == 2) // max value changed
+    {
+        constraints[symbol].max = std::stod(std::string(ui->tableWidget->item(row, 2)->text().toUtf8().constData()));
+    }
+}
+
 void Algorithm::putSymbolsToTable()
 {
-    auto extractSymbolsIntoSet = +[](std::string const& expression) -> std::set<std::string>
-    {
-        std::regex regex("x[0-9]+");
+    auto firstFunctionSymbols = Function(std::string(ui->function1->text().toUtf8().constData())).getSymbols();
+    auto secondFunctionSymbols = Function(std::string(ui->function2->text().toUtf8().constData())).getSymbols();
 
-        auto begin = std::sregex_iterator(expression.begin(), expression.end(), regex);
-        auto end = std::sregex_iterator();
+    std::set<std::string> symbols;
 
-        std::set<std::string> symbols;
+    std::merge(firstFunctionSymbols.begin(), firstFunctionSymbols.end(),
+               secondFunctionSymbols.begin(), secondFunctionSymbols.end(),
+               std::inserter(symbols, symbols.end()));
 
-        for(std::sregex_iterator i = begin; i != end; ++i)
-        {
-            symbols.insert((*i).str());
-        }
-        return symbols;
-    };
+    ui->tableWidget->clear();
 
-    auto firstFunctionSymbols = extractSymbolsIntoSet(std::string(ui->function1->text().toUtf8().constData()));
-    auto secondFunctionSymbols = extractSymbolsIntoSet(std::string(ui->function2->text().toUtf8().constData()));
-
-    firstFunctionSymbols.insert(secondFunctionSymbols.begin(), secondFunctionSymbols.end());
-
-    ui->tableWidget->setRowCount(firstFunctionSymbols.size());
+    ui->tableWidget->setRowCount(symbols.size());
     ui->tableWidget->setColumnCount(4);
 
     ui->tableWidget->setHorizontalHeaderLabels(QStringList{"Symbol", "Min value", "Max value", "Result"});
     // ui->tableWidget->setVerticalHeaderLabels(QStringList{"x1", "x2", "x3", "x4"});
 
     auto i = 0u;
-    for(auto const& symbol : firstFunctionSymbols)
+    for(auto const& symbol : symbols)
     {
-        auto *item = new QTableWidgetItem(QString::fromStdString(symbol));
+        auto* item = new QTableWidgetItem(QString::fromStdString(symbol));
         ui->tableWidget->setItem(i, 0, item);
         item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+
+        try
+        {
+            auto* minItem = new QTableWidgetItem(QString::fromStdString(std::to_string(constraints.at(symbol).min)));
+            ui->tableWidget->setItem(i, 1, minItem);
+        } catch(std::out_of_range&) {}
+
+        try
+        {
+            auto* maxItem = new QTableWidgetItem(QString::fromStdString(std::to_string(constraints.at(symbol).max)));
+            ui->tableWidget->setItem(i, 2, maxItem);
+        } catch(std::out_of_range&) {}
+
         i++;
     }
 }
@@ -243,9 +259,6 @@ void Algorithm::startCalculations()
 {
     firstFunction = std::make_unique<Function>(std::string(ui->function1->text().toUtf8().constData()));
     secondFunction = std::make_unique<Function>(std::string(ui->function2->text().toUtf8().constData()));
-
-    constraints["x1"] = Constraint(1.0, 3.0);
-    constraints["x2"] = Constraint(-1.0, 7.0);
 
     // ui->function2->setText(QString::fromStdString(std::to_string(firstFunction.calculateExpression())) +
     //                       QString::fromStdString(std::to_string(secondFunction.calculateExpression())));
