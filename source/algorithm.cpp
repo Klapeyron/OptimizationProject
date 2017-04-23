@@ -173,15 +173,9 @@ std::vector<Point> Algorithm::generatePoints(std::size_t numberOfPoints)
         auto secondFunctionSymbols = secondFunction->getSymbols();
 
         std::set<std::string> functionSymbols;
-        for(auto const& symbol : firstFunctionSymbols)
-        {
-            functionSymbols.insert(symbol);
-        }
-
-        for(auto const& symbol : secondFunctionSymbols)
-        {
-            functionSymbols.insert(symbol);
-        }
+        std::merge(firstFunctionSymbols.begin(), firstFunctionSymbols.end(),
+                   secondFunctionSymbols.begin(), secondFunctionSymbols.end(),
+                   std::inserter(functionSymbols, functionSymbols.end()));
 
         std::map<std::string, double> generatedSymbols;
 
@@ -228,8 +222,19 @@ Point Algorithm::mutate(Point const& point)
     auto symbolIt = symbolsOfBasedPoint.begin();
     std::advance(symbolIt, symbolIndex);
 
+    auto constraint = constraints[(*symbolIt).first];
     auto multiplicand = generator.generateDouble(-1, 1);
-    (*symbolIt).second = (*symbolIt).second + (*symbolIt).second * multiplicand;
+    auto newValue = (*symbolIt).second + (*symbolIt).second * multiplicand;
+
+    bool underConstaints = newValue >= constraint.min && newValue <= constraint.max;
+    if(underConstaints)
+    {
+        (*symbolIt).second = newValue;
+    }
+    else
+    {
+        // TODO: othervise
+    }
 
     return Point(*firstFunction, *secondFunction, std::move(symbolsOfBasedPoint));
 }
