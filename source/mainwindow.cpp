@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->function1, SIGNAL(editingFinished()), &algorithm, SLOT(putSymbolsToTable()));
     connect(ui->function2, SIGNAL(editingFinished()), &algorithm, SLOT(putSymbolsToTable()));
     connect(ui->tableWidget, SIGNAL(cellChanged(int,int)), &algorithm, SLOT(updateConstraints(int,int)));
+    connect(ui->tableWidget, SIGNAL(cellDoubleClicked(int,int)), &algorithm, SLOT(clearCell(int,int)));
 }
 
 MainWindow::~MainWindow()

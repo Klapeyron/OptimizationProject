@@ -75,6 +75,7 @@ public slots:
     void startCalculations();
     void putSymbolsToTable();
     void updateConstraints(int row, int column);
+    void clearCell(int row, int column);
 };
 
 #endif // ALGORITHM_H

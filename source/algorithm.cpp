@@ -96,6 +96,11 @@ double Function::calculateExpression()
     return expression_.value();
 }
 
+void Algorithm::clearCell(int row, int column)
+{
+    // ui->tableWidget->item(row, column)->setText(QString(""));
+}
+
 void Algorithm::updateConstraints(int row, int column)
 {
     auto symbol = std::string(ui->tableWidget->item(row, 0)->text().toUtf8().constData());
