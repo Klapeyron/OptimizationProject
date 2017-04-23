@@ -303,11 +303,11 @@ void Algorithm::startCalculations()
         {
             auto firstPos = generator.generateInt(0, temporarySet.size() - 1);
             auto firstPoint = temporarySet[firstPos];
-            //   temporarySet.erase(temporarySet.begin() + firstPos);
+            // temporarySet.erase(temporarySet.begin() + firstPos);
 
             auto secondPos = generator.generateInt(0, temporarySet.size() - 1);
             auto secondPoint = temporarySet[secondPos];
-            //   temporarySet.erase(temporarySet.begin() + secondPos);
+            // temporarySet.erase(temporarySet.begin() + secondPos);
 
             auto decisionVariable = generator.generateDouble(0,100);
             bool shouldCross = decisionVariable < pc;
@@ -316,6 +316,11 @@ void Algorithm::startCalculations()
             {
                 auto newPoint = crossover(firstPoint, secondPoint);
                 crossoverSet.push_back(std::move(newPoint));
+            }
+            else
+            {
+                crossoverSet.push_back(std::move(firstPoint));
+                crossoverSet.push_back(std::move(secondPoint));
             }
         }
 
@@ -330,6 +335,10 @@ void Algorithm::startCalculations()
             {
                 auto newPoint = mutate(crossoverPoint);
                 mutationSet.push_back(std::move(newPoint));
+            }
+            else
+            {
+                mutationSet.push_back(crossoverPoint);
             }
         }
 
