@@ -285,6 +285,12 @@ void Algorithm::startCalculations()
 
     for (unsigned t = 1; t < T; ++t)
     {
+        // TODO: Check what to do when crossing or mutation probability are so small
+        //       that p0 becomes 0 after swap
+        if (p0.size() == 0)
+        {
+            return;
+        }
         std::vector<Point> temporarySet;
 
         for(std::size_t i = 0; i < N; i++)
