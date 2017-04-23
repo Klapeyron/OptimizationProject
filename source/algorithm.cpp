@@ -220,15 +220,21 @@ Point Algorithm::crossover(Point const& firstPoint, Point const& secondPoint)
 {
     std::map<std::string, double> newSymbols;
 
-    for(auto const& symbol : firstPoint.getSymbols())
-    {
-        const auto symbolName = symbol.first;
-        auto valueOfSymbolInSecond = secondPoint.getSymbols().at(symbolName);
+    auto pointSymbolsMap = firstPoint.getSymbols();
 
-        auto newValue = (symbol.second + valueOfSymbolInSecond)/2;
+    unsigned i = 0;
+    for(auto it = pointSymbolsMap.begin(); ; it++)
+    {
+        i++;
+        if (i == pointSymbolsMap.size()/2)
+        {
+            break;
+        }
+        const auto  symbolName = (*it).first;
+
+        auto newValue = secondPoint.getSymbols().at(symbolName);
 
         newSymbols[symbolName] = newValue;
-        std::map<std::string, double> newYSymbols;
     }
 
     return Point(*firstFunction, *secondFunction, newSymbols);
@@ -278,14 +284,8 @@ void Algorithm::startCalculations()
 
     std::vector<Point> p0 = generatePoints(N);
 
-    for (unsigned t = 1; t < T; ++t)
+    for (unsigned t = 0; t < T; ++t)
     {
-        // TODO: Check what to do when crossing or mutation probability are so small
-        //       that p0 becomes 0 after swap
-        if (p0.size() == 0)
-        {
-            return;
-        }
         std::vector<Point> temporarySet;
 
         for(std::size_t i = 0; i < N; i++)
@@ -337,8 +337,10 @@ void Algorithm::startCalculations()
 
             if(shouldCross)
             {
-                auto newPoint = crossover(firstPoint, secondPoint);
-                crossoverSet.push_back(std::move(newPoint));
+                auto newPoint1 = crossover(firstPoint, secondPoint);
+                auto newPoint2 = crossover(secondPoint, firstPoint);
+                crossoverSet.push_back(std::move(newPoint1));
+                crossoverSet.push_back(std::move(newPoint2));
             }
             else
             {
