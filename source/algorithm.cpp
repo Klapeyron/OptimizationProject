@@ -222,15 +222,11 @@ Point Algorithm::crossover(Point const& firstPoint, Point const& secondPoint)
 
     auto pointSymbolsMap = firstPoint.getSymbols();
 
-    unsigned i = 0;
-    for(auto it = pointSymbolsMap.begin(); ; it++)
+    auto symbolIt = pointSymbolsMap.begin();
+    for(unsigned i = 0; i != pointSymbolsMap.size()/2; i++)
     {
-        i++;
-        if (i == pointSymbolsMap.size()/2)
-        {
-            break;
-        }
-        const auto  symbolName = (*it).first;
+        symbolIt++;
+        const auto  symbolName = (*symbolIt).first;
 
         auto newValue = secondPoint.getSymbols().at(symbolName);
 
