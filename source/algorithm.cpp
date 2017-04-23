@@ -256,7 +256,7 @@ Point Algorithm::mutate(Point const& point)
     }
     else
     {
-        // TODO: othervise
+        (*symbolIt).second = generator.generateDouble(constraint.min, constraint.max);
     }
 
     return Point(*firstFunction, *secondFunction, std::move(symbolsOfBasedPoint));
