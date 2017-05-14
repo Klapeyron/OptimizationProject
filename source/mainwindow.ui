@@ -78,7 +78,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>850</x>
@@ -170,6 +170,18 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>function1</tabstop>
+  <tabstop>function2</tabstop>
+  <tabstop>tableWidget</tabstop>
+  <tabstop>populationSize</tabstop>
+  <tabstop>maxGenertation</tabstop>
+  <tabstop>crossingProbability</tabstop>
+  <tabstop>mutationProbability</tabstop>
+  <tabstop>sigma</tabstop>
+  <tabstop>startButton</tabstop>
+  <tabstop>resultsTable</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
