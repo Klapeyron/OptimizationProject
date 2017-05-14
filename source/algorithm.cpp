@@ -4,21 +4,23 @@
 #include <regex>
 #include <map>
 #include <set>
+#include <thread>
+#include <chrono>
 
-Point::Point(Function& firstFunction, Function& secondFunction, std::map<std::string, double> const& initialSymbols)
+Point::Point(std::shared_ptr<Function> firstFunction, std::shared_ptr<Function> secondFunction, std::map<std::string, double> const& initialSymbols)
     :firstFunction(firstFunction),
      secondFunction(secondFunction)
 {
-    auto applySymbols = [&](Function& function)
+    auto applySymbols = [&](std::shared_ptr<Function> function)
     {
-        auto functionSymbols = function.getSymbols();
+        auto functionSymbols = function->getSymbols();
 
         for(auto const& symbol : functionSymbols)
         {
             try
             {
                 auto initialValue = initialSymbols.at(symbol);
-                function.setValue(symbol, initialValue);
+                function->setValue(symbol, initialValue);
                 symbols[symbol] = initialValue;
             }
             catch(std::out_of_range & exception)
@@ -31,8 +33,8 @@ Point::Point(Function& firstFunction, Function& secondFunction, std::map<std::st
     applySymbols(firstFunction);
     applySymbols(secondFunction);
 
-    xValue = firstFunction.calculateExpression();
-    yValue = secondFunction.calculateExpression();
+    xValue = firstFunction->calculateExpression();
+    yValue = secondFunction->calculateExpression();
 }
 
 double Point::getXValue() const
@@ -128,10 +130,9 @@ void Algorithm::putSymbolsToTable()
     ui->tableWidget->clear();
 
     ui->tableWidget->setRowCount(symbols.size());
-    ui->tableWidget->setColumnCount(4);
+    ui->tableWidget->setColumnCount(3);
 
-    ui->tableWidget->setHorizontalHeaderLabels(QStringList{"Symbol", "Min value", "Max value", "Result"});
-    // ui->tableWidget->setVerticalHeaderLabels(QStringList{"x1", "x2", "x3", "x4"});
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList{"Symbol", "Min value", "Max value"});
 
     auto i = 0u;
     for(auto const& symbol : symbols)
@@ -209,31 +210,61 @@ std::vector<Point> Algorithm::generatePoints(std::size_t numberOfPoints)
 
             generatedSymbols[symbol] = generatedSymbolValue;
         }
-        auto generatedPoint = Point(*firstFunction, *secondFunction, std::move(generatedSymbols));
+        auto generatedPoint = Point(firstFunction, secondFunction, std::move(generatedSymbols));
         points.push_back(std::move(generatedPoint));
     }
 
     return points;
 }
 
-Point Algorithm::crossover(Point const& firstPoint, Point const& secondPoint)
-{
-    std::map<std::string, double> newSymbols;
+std::pair<Point, Point> Algorithm::crossover(Point const& firstPoint, Point const& secondPoint)
+{   
+    std::map<std::string, double> newFirstSymbols, newSecondSymbols;
 
-    auto pointSymbolsMap = firstPoint.getSymbols();
+    auto allSymbols = firstPoint.getSymbols();
 
-    auto symbolIt = pointSymbolsMap.begin();
-    for(unsigned i = 0; i != pointSymbolsMap.size()/2; i++)
+    for (auto const& symbolPair : allSymbols)
     {
-        symbolIt++;
-        const auto  symbolName = (*symbolIt).first;
-
-        auto newValue = secondPoint.getSymbols().at(symbolName);
-
-        newSymbols[symbolName] = newValue;
+        auto & symbol = symbolPair.first;
+        auto decisionVariable = generator.generateInt(0, 1);
+        bool selectFirst = decisionVariable == 0;
+        if(selectFirst)
+        {
+            newFirstSymbols[symbol] = firstPoint.getSymbols().at(symbol);
+            newSecondSymbols[symbol] = secondPoint.getSymbols().at(symbol);
+        }
+        else
+        {
+            newFirstSymbols[symbol] = secondPoint.getSymbols().at(symbol);
+            newSecondSymbols[symbol] = firstPoint.getSymbols().at(symbol);
+        }
     }
 
-    return Point(*firstFunction, *secondFunction, newSymbols);
+    return std::make_pair<Point, Point>(Point(firstFunction, secondFunction, newFirstSymbols),
+                                        Point(firstFunction, secondFunction, newSecondSymbols));
+//    auto symbolIt = pointSymbolsMap.begin();
+//    for(unsigned i = 0; i != pointSymbolsMap.size()/2; i++)
+//    {
+//        const auto  symbolName = (*symbolIt).first;
+
+//        auto newValue = secondPoint.getSymbols().at(symbolName);
+
+//        newSymbols[symbolName] = newValue;
+//        symbolIt++;
+//    }
+
+//    for (; symbolIt != pointSymbolsMap.end(); symbolIt++)
+//    {
+//        const auto  symbolName = (*symbolIt).first;
+
+//        auto newValue = secondPoint.getSymbols().at(symbolName);
+
+//        newSymbols[symbolName] = newValue;
+//    }
+
+//    auto newPointInCrossOver = Point(firstFunction, secondFunction, newSymbols);
+
+//    return newPointInCrossOver;
 }
 
 Point Algorithm::mutate(Point const& point)
@@ -256,16 +287,111 @@ Point Algorithm::mutate(Point const& point)
     }
     else
     {
-        (*symbolIt).second = generator.generateDouble(constraint.min, constraint.max);
+        // TODO: othervise
     }
 
-    return Point(*firstFunction, *secondFunction, std::move(symbolsOfBasedPoint));
+    return Point(firstFunction, secondFunction, std::move(symbolsOfBasedPoint));
+}
+
+void Algorithm::printPoints(const std::vector<Point>& points)
+{
+    ui->figurePlot->addGraph();
+
+    QVector<double> xValue(points.size()), yValue(points.size());
+
+    for (auto const& point : points)
+    {
+        xValue.push_back(point.getXValue());
+        yValue.push_back(point.getYValue());
+    }
+
+    auto minmaxf1 = std::minmax_element(points.begin(), points.end(),
+                                  [](const auto& point1, const auto& point2)
+    {
+        return point1.getXValue() < point2.getXValue();
+    });
+    auto minmaxf2 = std::minmax_element(points.begin(), points.end(),
+                                  [](const auto& point1, const auto& point2)
+    {
+        return point1.getYValue() < point2.getYValue();
+    });
+
+    ui->figurePlot->graph(0)->setData(xValue, yValue);
+    ui->figurePlot->graph(0)->setLineStyle(QCPGraph::lsNone);
+    ui->figurePlot->graph(0)->setScatterStyle(QCPScatterStyle::ssDot);
+    ui->figurePlot->graph(0)->setPen(QPen(QBrush(Qt::blue), 4));
+    ui->figurePlot->xAxis->setLabel("f1");
+    ui->figurePlot->yAxis->setLabel("f2");
+
+    ui->figurePlot->xAxis->setRange(minmaxf1.first->getXValue(), minmaxf1.second->getXValue());
+    ui->figurePlot->yAxis->setRange(minmaxf2.first->getYValue(), minmaxf2.second->getYValue());
+
+    ui->figurePlot->replot();
+}
+
+void Algorithm::tabularizePoints(std::vector<Point>& points)
+{
+    std::sort(points.begin(), points.end(),
+              [](Point const& left, Point const& right)
+    {
+        return left.getXValue() < right.getXValue();
+    });
+
+    auto firstFunctionSymbols = firstFunction->getSymbols();
+    auto secondFunctionSymbols = secondFunction->getSymbols();
+
+    std::set<std::string> symbols;
+
+    std::merge(firstFunctionSymbols.begin(), firstFunctionSymbols.end(),
+               secondFunctionSymbols.begin(), secondFunctionSymbols.end(),
+               std::inserter(symbols, symbols.end()));
+
+    ui->resultsTable->clear();
+
+    ui->resultsTable->setRowCount(points.size());
+    ui->resultsTable->setColumnCount(symbols.size()+2);
+
+    auto tableColumnsLabels = QStringList{"f1", "f2"};
+    for (auto const& symbol : symbols)
+    {
+        tableColumnsLabels.push_back(QString::fromStdString(symbol));
+    }
+    ui->resultsTable->setHorizontalHeaderLabels(tableColumnsLabels);
+
+    auto i = 0u;
+    for(auto const& point : points)
+    {
+        try
+        {
+            auto* f1Item = new QTableWidgetItem(QString::fromStdString(std::to_string(point.getXValue())));
+            ui->resultsTable->setItem(i, 0, f1Item);
+            f1Item->setFlags(f1Item->flags() ^ Qt::ItemIsEditable);
+
+            auto* f2Item = new QTableWidgetItem(QString::fromStdString(std::to_string(point.getYValue())));
+            ui->resultsTable->setItem(i, 1, f2Item);
+            f2Item->setFlags(f2Item->flags() ^ Qt::ItemIsEditable);
+        } catch(std::out_of_range&) {}
+
+        auto j = 2u;
+        for (auto const& symbol : symbols)
+        {
+            try
+            {
+                auto* symbolItem = new QTableWidgetItem(QString::fromStdString(std::to_string(point.getSymbols().at(symbol))));
+                ui->resultsTable->setItem(i, j, symbolItem);
+                symbolItem->setFlags(symbolItem->flags() ^ Qt::ItemIsEditable);
+            }
+            catch (std::out_of_range&) {}
+            j++;
+        }
+        i++;
+    }
 }
 
 void Algorithm::startCalculations()
 {
-    firstFunction = std::make_unique<Function>(std::string(ui->function1->text().toUtf8().constData()));
-    secondFunction = std::make_unique<Function>(std::string(ui->function2->text().toUtf8().constData()));
+    firstFunction = std::make_shared<Function>(std::string(ui->function1->text().toUtf8().constData()));
+    secondFunction = std::make_shared<Function>(std::string(ui->function2->text().toUtf8().constData()));
 
     // ui->function2->setText(QString::fromStdString(std::to_string(firstFunction.calculateExpression())) +
     //                       QString::fromStdString(std::to_string(secondFunction.calculateExpression())));
@@ -282,6 +408,7 @@ void Algorithm::startCalculations()
 
     for (unsigned t = 0; t < T; ++t)
     {
+        printPoints(p0);
         std::vector<Point> temporarySet;
 
         for(std::size_t i = 0; i < N; i++)
@@ -322,21 +449,26 @@ void Algorithm::startCalculations()
         {
             auto firstPos = generator.generateInt(0, temporarySet.size() - 1);
             auto firstPoint = temporarySet[firstPos];
-            // temporarySet.erase(temporarySet.begin() + firstPos);
 
-            auto secondPos = generator.generateInt(0, temporarySet.size() - 1);
+            unsigned secondPos;
+            do
+            {
+                secondPos = generator.generateInt(0, temporarySet.size() - 1);
+            } while(firstPos == secondPos);
             auto secondPoint = temporarySet[secondPos];
-            // temporarySet.erase(temporarySet.begin() + secondPos);
+
+            temporarySet.erase(temporarySet.begin() + secondPos);
+            temporarySet.erase(temporarySet.begin() + firstPos);
 
             auto decisionVariable = generator.generateDouble(0,100);
             bool shouldCross = decisionVariable < pc;
 
             if(shouldCross)
             {
-                auto newPoint1 = crossover(firstPoint, secondPoint);
-                auto newPoint2 = crossover(secondPoint, firstPoint);
-                crossoverSet.push_back(std::move(newPoint1));
-                crossoverSet.push_back(std::move(newPoint2));
+                auto pointsPair = crossover(firstPoint, secondPoint);
+
+                crossoverSet.push_back(std::move(pointsPair.first));
+                crossoverSet.push_back(std::move(pointsPair.second));
             }
             else
             {
@@ -365,5 +497,8 @@ void Algorithm::startCalculations()
 
         p0.clear();
         p0.swap(mutationSet);
+//        std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
+    printPoints(p0);
+    tabularizePoints(p0);
 }

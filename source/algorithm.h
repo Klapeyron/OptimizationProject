@@ -34,15 +34,15 @@ public:
 class Point
 {
 public:
-    Point(Function& firstFunction,
-          Function& secondFunction,
+    Point(std::shared_ptr<Function> firstFunction,
+          std::shared_ptr<Function> secondFunction,
           std::map<std::string, double> const& symbols);
     const std::map<std::string, double>& getSymbols() const;
     double getXValue() const;
     double getYValue() const;
 private:
-    Function& firstFunction;
-    Function& secondFunction;
+    std::shared_ptr<Function> firstFunction;
+    std::shared_ptr<Function> secondFunction;
 
     double xValue, yValue;
     std::map<std::string, double> symbols;
@@ -62,14 +62,17 @@ class Algorithm :public QObject
 
     std::map<std::string, Constraint> constraints;
     RandomGenerator generator;
-    std::unique_ptr<Function> firstFunction, secondFunction;
+    std::shared_ptr<Function> firstFunction, secondFunction;
+
+    void printPoints(const std::vector<Point>& points);
+    void tabularizePoints(std::vector<Point>& points);
 public:
     Algorithm(Ui::MainWindow* ui) :ui(ui) {}
     virtual ~Algorithm() {};
 
     std::vector<Point> generatePoints(std::size_t numberOfPoints);
 
-    Point crossover(Point const& firstPoint, Point const& secondPoint);
+    std::pair<Point, Point> crossover(Point const& firstPoint, Point const& secondPoint);
     Point mutate(Point const& firstPoint);
 public slots:
     void startCalculations();
