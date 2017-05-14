@@ -7,3 +7,5 @@
 
 #QT
 *.pro.user
+
+source/project.pro.user

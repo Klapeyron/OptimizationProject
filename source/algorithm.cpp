@@ -98,9 +98,25 @@ double Function::calculateExpression()
     return expression_.value();
 }
 
+bool Constraint::calculateConstraints()
+{
+    try
+    {
+        min = std::stod(minString);
+        max = std::stod(maxString);
+        if(max < min)
+            return false;
+        return true;
+    } catch(std::invalid_argument&)
+    {
+        return false;
+    }
+}
+
 void Algorithm::clearCell(int row, int column)
 {
-    // ui->tableWidget->item(row, column)->setText(QString(""));
+    auto* newClearItem = new QTableWidgetItem(QString(""));
+    ui->tableWidget->setItem(row, column, newClearItem);
 }
 
 void Algorithm::updateConstraints(int row, int column)
@@ -108,11 +124,11 @@ void Algorithm::updateConstraints(int row, int column)
     auto symbol = std::string(ui->tableWidget->item(row, 0)->text().toUtf8().constData());
     if(column == 1) // min value changed
     {
-        constraints[symbol].min = std::stod(std::string(ui->tableWidget->item(row, 1)->text().toUtf8().constData()));
+        constraints[symbol].minString = std::string(ui->tableWidget->item(row, 1)->text().toUtf8().constData());
     }
     else if(column == 2) // max value changed
     {
-        constraints[symbol].max = std::stod(std::string(ui->tableWidget->item(row, 2)->text().toUtf8().constData()));
+        constraints[symbol].maxString = std::string(ui->tableWidget->item(row, 2)->text().toUtf8().constData());
     }
 }
 
@@ -280,16 +296,18 @@ Point Algorithm::mutate(Point const& point)
     auto multiplicand = generator.generateDouble(-1, 1);
     auto newValue = (*symbolIt).second + (*symbolIt).second * multiplicand;
 
-    bool underConstaints = newValue >= constraint.min && newValue <= constraint.max;
-    if(underConstaints)
+    auto underConstaints = [&](auto newValue)
     {
-        (*symbolIt).second = newValue;
-    }
-    else
+        return newValue >= constraint.min and newValue <= constraint.max;
+    };
+
+    while(not underConstaints(newValue))
     {
-        (*symbolIt).second = generator.generateDouble(constraint.min, constraint.max);
-        // TODO: othervise
+        multiplicand = generator.generateDouble(-1, 1);
+        newValue = (*symbolIt).second + (*symbolIt).second * multiplicand;
     }
+
+    (*symbolIt).second = newValue;
 
     return Point(firstFunction, secondFunction, std::move(symbolsOfBasedPoint));
 }
@@ -391,11 +409,21 @@ void Algorithm::tabularizePoints(std::vector<Point>& points)
 
 void Algorithm::startCalculations()
 {
+    for (auto& constraint : constraints)
+    {
+        if(not constraint.second.calculateConstraints())
+        {
+            // TODO: do something if invalid input in constraints
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Invalid constraints");
+            msgBox.setText("Invalid constraints for " + QString::fromStdString(constraint.first));
+            msgBox.exec();
+            return;
+        }
+    }
+
     firstFunction = std::make_shared<Function>(std::string(ui->function1->text().toUtf8().constData()));
     secondFunction = std::make_shared<Function>(std::string(ui->function2->text().toUtf8().constData()));
-
-    // ui->function2->setText(QString::fromStdString(std::to_string(firstFunction.calculateExpression())) +
-    //                       QString::fromStdString(std::to_string(secondFunction.calculateExpression())));
 
     auto pm = ui->mutationProbability->text().toDouble();
     auto pc = ui->crossingProbability->text().toDouble();
@@ -443,7 +471,11 @@ void Algorithm::startCalculations()
             }
         }
 
-        // TODO: VEGA 3, 4, 5
+//        std::sort(temporarySet.begin(), temporarySet.end(),
+//                  [](Point const& left, Point const& right)
+//        {
+//            return left.getXValue() < right.getXValue();
+//        });
         std::vector<Point> crossoverSet;
 
         for(std::size_t i = 0; i < std::floor(N/2); i++)
@@ -499,7 +531,9 @@ void Algorithm::startCalculations()
         p0.clear();
         p0.swap(mutationSet);
 //        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        ui->progressBar->setValue((t * 100/T) + 1);
     }
     printPoints(p0);
+    ui->progressBar->setValue(100);
     tabularizePoints(p0);
 }

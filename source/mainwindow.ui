@@ -140,6 +140,25 @@
      </item>
     </layout>
    </widget>
+   <widget class="QProgressBar" name="progressBar">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>680</y>
+      <width>1031</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="invertedAppearance">
+     <bool>false</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -147,7 +166,7 @@
      <x>0</x>
      <y>0</y>
      <width>1072</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

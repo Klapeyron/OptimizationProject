@@ -50,8 +50,11 @@ private:
 
 struct Constraint
 {
-    Constraint(double min = 0.0, double max = 0.0) :min(min), max(max) {}
-    double min, max;
+    Constraint(std::string min = "0.0", std::string max = "0.0") :minString(min), maxString(max) {}
+    double min = 0.0, max = 0.0;
+    std::string minString, maxString;
+
+    bool calculateConstraints();
 };
 
 class Algorithm :public QObject
