@@ -1,0 +1,9 @@
+#Latex generated
+*.pdf
+*.aux
+*.log
+*.synctex.gz
+*.fig
+
+#QT
+*.pro.user
