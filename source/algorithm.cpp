@@ -287,6 +287,7 @@ Point Algorithm::mutate(Point const& point)
     }
     else
     {
+        (*symbolIt).second = generator.generateDouble(constraint.min, constraint.max);
         // TODO: othervise
     }
 
