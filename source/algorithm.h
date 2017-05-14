@@ -71,7 +71,7 @@ class Algorithm :public QObject
     void tabularizePoints(std::vector<Point>& points);
 public:
     Algorithm(Ui::MainWindow* ui) :ui(ui) {}
-    virtual ~Algorithm() {};
+    virtual ~Algorithm() {}
 
     std::vector<Point> generatePoints(std::size_t numberOfPoints);
 

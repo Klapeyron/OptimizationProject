@@ -258,29 +258,6 @@ std::pair<Point, Point> Algorithm::crossover(Point const& firstPoint, Point cons
 
     return std::make_pair<Point, Point>(Point(firstFunction, secondFunction, newFirstSymbols),
                                         Point(firstFunction, secondFunction, newSecondSymbols));
-//    auto symbolIt = pointSymbolsMap.begin();
-//    for(unsigned i = 0; i != pointSymbolsMap.size()/2; i++)
-//    {
-//        const auto  symbolName = (*symbolIt).first;
-
-//        auto newValue = secondPoint.getSymbols().at(symbolName);
-
-//        newSymbols[symbolName] = newValue;
-//        symbolIt++;
-//    }
-
-//    for (; symbolIt != pointSymbolsMap.end(); symbolIt++)
-//    {
-//        const auto  symbolName = (*symbolIt).first;
-
-//        auto newValue = secondPoint.getSymbols().at(symbolName);
-
-//        newSymbols[symbolName] = newValue;
-//    }
-
-//    auto newPointInCrossOver = Point(firstFunction, secondFunction, newSymbols);
-
-//    return newPointInCrossOver;
 }
 
 Point Algorithm::mutate(Point const& point)
@@ -339,6 +316,7 @@ void Algorithm::printPoints(const std::vector<Point>& points)
     ui->figurePlot->graph(0)->setLineStyle(QCPGraph::lsNone);
     ui->figurePlot->graph(0)->setScatterStyle(QCPScatterStyle::ssDot);
     ui->figurePlot->graph(0)->setPen(QPen(QBrush(Qt::blue), 4));
+
     ui->figurePlot->xAxis->setLabel("f1");
     ui->figurePlot->yAxis->setLabel("f2");
 
@@ -493,7 +471,7 @@ void Algorithm::startCalculations()
             temporarySet.erase(temporarySet.begin() + secondPos);
             temporarySet.erase(temporarySet.begin() + firstPos);
 
-            auto decisionVariable = generator.generateDouble(0,100);
+            auto decisionVariable = generator.generateDouble(0, 100);
             bool shouldCross = decisionVariable < pc;
 
             if(shouldCross)
@@ -514,7 +492,7 @@ void Algorithm::startCalculations()
 
         for (auto const& crossoverPoint : crossoverSet)
         {
-            auto decisionVariable = generator.generateDouble(0,100);
+            auto decisionVariable = generator.generateDouble(0, 100);
             bool shouldMutate = decisionVariable < pm;
 
             if(shouldMutate)
