@@ -294,7 +294,7 @@ Point Algorithm::mutate(Point const& point)
     std::advance(symbolIt, symbolIndex);
 
     auto constraint = constraints[(*symbolIt).first];
-    auto multiplicand = generator.generateDouble(-0.1, 0.1);
+    auto multiplicand = generator.generateDouble(-1, 1);
     auto newValue = (*symbolIt).second + (*symbolIt).second * multiplicand;
 
     auto underConstaints = [&](auto newValue)
@@ -304,13 +304,22 @@ Point Algorithm::mutate(Point const& point)
 
     while(not underConstaints(newValue))
     {
-        multiplicand = generator.generateDouble(-0.1, 0.1);
+        multiplicand = generator.generateDouble(-1, 1);
         newValue = (*symbolIt).second + (*symbolIt).second * multiplicand;
     }
 
     (*symbolIt).second = newValue;
 
-    return Point(firstFunction, secondFunction, std::move(symbolsOfBasedPoint));
+    auto newPoint = Point(firstFunction, secondFunction, std::move(symbolsOfBasedPoint));
+
+    if(not isDominated({point}, newPoint))
+    {
+        return newPoint;
+    }
+    else
+    {
+        return point;
+    }
 }
 
 void Algorithm::printPoints(const std::vector<Point>& points)
