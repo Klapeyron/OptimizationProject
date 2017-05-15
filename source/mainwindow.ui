@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1072</width>
-    <height>745</height>
+    <height>748</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>980</x>
-      <y>180</y>
+      <y>160</y>
       <width>71</width>
       <height>27</height>
      </rect>
@@ -64,7 +64,7 @@
       <x>460</x>
       <y>220</y>
       <width>591</width>
-      <height>451</height>
+      <height>421</height>
      </rect>
     </property>
    </widget>
@@ -74,77 +74,15 @@
       <x>20</x>
       <y>110</y>
       <width>411</width>
-      <height>561</height>
+      <height>531</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>850</x>
-      <y>10</y>
-      <width>201</width>
-      <height>166</height>
-     </rect>
-    </property>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Population size</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="populationSize"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Max generation</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="maxGenertation"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Crossing probability</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="crossingProbability"/>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Mutation probability</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="mutationProbability"/>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Sigma</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="sigma"/>
-     </item>
-    </layout>
    </widget>
    <widget class="QProgressBar" name="progressBar">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>680</y>
+      <y>650</y>
       <width>1031</width>
       <height>23</height>
      </rect>
@@ -159,6 +97,144 @@
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>110</y>
+      <width>40</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>tdom</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="tdom">
+    <property name="geometry">
+     <rect>
+      <x>990</x>
+      <y>110</y>
+      <width>59</width>
+      <height>28</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>6</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Population size</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="maxGenertation">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>40</y>
+      <width>59</width>
+      <height>28</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>6</y>
+      <width>132</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Crossing probability</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="crossingProbability">
+    <property name="geometry">
+     <rect>
+      <x>990</x>
+      <y>6</y>
+      <width>59</width>
+      <height>28</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="sigma">
+    <property name="geometry">
+     <rect>
+      <x>990</x>
+      <y>74</y>
+      <width>59</width>
+      <height>28</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>74</y>
+      <width>40</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sigma</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>40</y>
+      <width>134</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Mutation probability</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="populationSize">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>6</y>
+      <width>59</width>
+      <height>28</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>40</y>
+      <width>102</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Max generation</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="mutationProbability">
+    <property name="geometry">
+     <rect>
+      <x>990</x>
+      <y>40</y>
+      <width>59</width>
+      <height>28</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -166,7 +242,7 @@
      <x>0</x>
      <y>0</y>
      <width>1072</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
@@ -198,6 +274,7 @@
   <tabstop>crossingProbability</tabstop>
   <tabstop>mutationProbability</tabstop>
   <tabstop>sigma</tabstop>
+  <tabstop>tdom</tabstop>
   <tabstop>startButton</tabstop>
   <tabstop>resultsTable</tabstop>
  </tabstops>

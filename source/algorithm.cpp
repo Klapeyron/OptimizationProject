@@ -260,6 +260,30 @@ std::pair<Point, Point> Algorithm::crossover(Point const& firstPoint, Point cons
                                         Point(firstFunction, secondFunction, newSecondSymbols));
 }
 
+std::vector<Point> Algorithm::chooseRandomPointsFromSet(const std::vector<Point>& points,
+                                                        const unsigned& amountOfPoints)
+{
+    std::vector<unsigned> indexVector;
+    unsigned tempIndex;
+
+    for(auto i = 0u; i != amountOfPoints; i++)
+    {
+        do
+        {
+            tempIndex = generator.generateInt(0, points.size() - 1);
+        } while(std::find(indexVector.begin(), indexVector.end(), tempIndex) != indexVector.end());
+        indexVector.push_back(tempIndex);
+    }
+
+    std::vector<Point> result;
+    for (auto const& index : indexVector)
+    {
+        result.push_back(points[index]);
+    }
+
+    return result;
+}
+
 Point Algorithm::mutate(Point const& point)
 {
     auto symbolsOfBasedPoint = point.getSymbols();
@@ -270,7 +294,7 @@ Point Algorithm::mutate(Point const& point)
     std::advance(symbolIt, symbolIndex);
 
     auto constraint = constraints[(*symbolIt).first];
-    auto multiplicand = generator.generateDouble(-1, 1);
+    auto multiplicand = generator.generateDouble(-0.1, 0.1);
     auto newValue = (*symbolIt).second + (*symbolIt).second * multiplicand;
 
     auto underConstaints = [&](auto newValue)
@@ -280,7 +304,7 @@ Point Algorithm::mutate(Point const& point)
 
     while(not underConstaints(newValue))
     {
-        multiplicand = generator.generateDouble(-1, 1);
+        multiplicand = generator.generateDouble(-0.1, 0.1);
         newValue = (*symbolIt).second + (*symbolIt).second * multiplicand;
     }
 
@@ -408,8 +432,7 @@ void Algorithm::startCalculations()
     auto T = ui->maxGenertation->text().toUInt();
     auto N = ui->populationSize->text().toUInt();
     auto sigma = ui->sigma->text().toDouble();
-
-    auto tdom = 7u;
+    auto tdom = ui->tdom->text().toUInt();
 
     std::vector<Point> p0 = generatePoints(N);
 
@@ -423,7 +446,7 @@ void Algorithm::startCalculations()
             auto firstPoint = p0[generator.generateInt(0, p0.size() - 1)];
             auto secondPoint = p0[generator.generateInt(0, p0.size() - 1)];
 
-            std::vector<Point> compareSet = generatePoints(tdom);
+            std::vector<Point> compareSet = chooseRandomPointsFromSet(p0, tdom);
 
             if(not isDominated(compareSet, firstPoint) and isDominated(compareSet, secondPoint))
             {

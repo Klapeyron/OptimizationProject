@@ -69,6 +69,8 @@ class Algorithm :public QObject
 
     void printPoints(const std::vector<Point>& points);
     void tabularizePoints(std::vector<Point>& points);
+    std::vector<Point> chooseRandomPointsFromSet(const std::vector<Point>& points,
+                                                 const unsigned& amountOfPoints);
 public:
     Algorithm(Ui::MainWindow* ui) :ui(ui) {}
     virtual ~Algorithm() {}
