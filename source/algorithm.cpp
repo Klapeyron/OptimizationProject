@@ -534,7 +534,16 @@ void Algorithm::startCalculations()
 //        std::this_thread::sleep_for(std::chrono::milliseconds(300));
         ui->progressBar->setValue((t * 100/T) + 1);
     }
-    printPoints(p0);
+    auto pointsToPrint = std::vector<Point> {};
+    for (auto const& point : p0)
+    {
+        bool dominated = isDominated(p0, point);
+        if (not dominated)
+        {
+            pointsToPrint.push_back(point);
+        }
+    }
+    printPoints(pointsToPrint);
     ui->progressBar->setValue(100);
-    tabularizePoints(p0);
+    tabularizePoints(pointsToPrint);
 }
