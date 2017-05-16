@@ -1,9 +1,7 @@
-#include "exprtk.hpp"
 #include "algorithm.h"
 
 #include <regex>
 #include <map>
-#include <set>
 #include <thread>
 #include <chrono>
 
@@ -66,11 +64,10 @@ Function::Function(std::string const& expression)
 
     for(auto & symbolPair : uniqueSymbols_)
     {
-        symbol_table_.add_variable(symbolPair.first, uniqueSymbols_[symbolPair.first]);
+        parser_.DefineVar(symbolPair.first, &uniqueSymbols_[symbolPair.first]);
     }
 
-    expression_.register_symbol_table(symbol_table_);
-    parser_.compile(expression, expression_);
+    parser_.SetExpr(expression);
 }
 
 std::set<std::string> Function::getSymbols()
@@ -95,7 +92,7 @@ bool Function::setValue(std::string const& symbol, double const& newValue)
 
 double Function::calculateExpression()
 {
-    return expression_.value();
+    return parser_.Eval();
 }
 
 bool Constraint::calculateConstraints()

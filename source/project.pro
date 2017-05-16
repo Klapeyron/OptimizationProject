@@ -28,13 +28,35 @@ SOURCES += main.cpp\
         mainwindow.cpp \
         qcustomplot.cpp \
     algorithm.cpp \
-    random.cpp
+    random.cpp \
+    muParser.cpp \
+    muParserBase.cpp \
+    muParserBytecode.cpp \
+    muParserCallback.cpp \
+    muParserDLL.cpp \
+    muParserError.cpp \
+    muParserInt.cpp \
+    muParserTest.cpp \
+    muParserTokenReader.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
         qcustomplot.h \
     algorithm.h \
-    exprtk.hpp \
-    random.hpp
+    random.hpp \
+    muParser.h \
+    muParserBase.h \
+    muParserBytecode.h \
+    muParserCallback.h \
+    muParserDef.h \
+    muParserDLL.h \
+    muParserError.h \
+    muParserFixes.h \
+    muParserInt.h \
+    muParserStack.h \
+    muParserTemplateMagic.h \
+    muParserTest.h \
+    muParserToken.h \
+    muParserTokenReader.h
 
 FORMS    += mainwindow.ui
 

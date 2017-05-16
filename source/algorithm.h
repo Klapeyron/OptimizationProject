@@ -2,16 +2,14 @@
 #define ALGORITHM_H
 
 #include <string>
-#include "exprtk.hpp"
 #include <QMainWindow>
 #include <QObject>
 #include <ui_mainwindow.h>
-#include "random.hpp"
 #include <memory>
+#include <set>
 
-using symbol_table_t = exprtk::symbol_table<double>;
-using expression_t   = exprtk::expression<double>;
-using parser_t       = exprtk::parser<double>;
+#include "random.hpp"
+#include "muParser.h"
 
 namespace Ui {
   class MainWindow;
@@ -19,10 +17,7 @@ namespace Ui {
 
 class Function
 {
-    symbol_table_t symbol_table_;
-    parser_t parser_;
-    expression_t expression_;
-
+    mu::Parser parser_;
     std::map<std::string, double> uniqueSymbols_;
 public:
     Function(std::string const& expression);
