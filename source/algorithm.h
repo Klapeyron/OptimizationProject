@@ -35,6 +35,8 @@ public:
     const std::map<std::string, double>& getSymbols() const;
     double getXValue() const;
     double getYValue() const;
+    std::shared_ptr<Function> getFirstFunction() const;
+    std::shared_ptr<Function> getSecondFunction() const;
 private:
     std::shared_ptr<Function> firstFunction;
     std::shared_ptr<Function> secondFunction;

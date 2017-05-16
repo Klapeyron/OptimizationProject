@@ -50,6 +50,16 @@ const std::map<std::string, double>& Point::getSymbols() const
     return symbols;
 }
 
+std::shared_ptr<Function> Point::getFirstFunction() const
+{
+    return firstFunction;
+}
+
+std::shared_ptr<Function> Point::getSecondFunction() const
+{
+    return firstFunction;
+}
+
 Function::Function(std::string const& expression)
 {
     std::regex symbols("x[0-9]+");
@@ -257,8 +267,46 @@ std::pair<Point, Point> Algorithm::crossover(Point const& firstPoint, Point cons
         }
     }
 
-    return std::make_pair<Point, Point>(Point(firstFunction, secondFunction, newFirstSymbols),
-                                        Point(firstFunction, secondFunction, newSecondSymbols));
+    auto newPoint1 = Point(firstFunction, secondFunction, newFirstSymbols);
+    auto newPoint2 = Point(firstFunction, secondFunction, newSecondSymbols);
+
+    auto includeFirstPoint = not isDominated({firstPoint, secondPoint}, newPoint1);
+    auto includeSecondPoint = not isDominated({firstPoint, secondPoint}, newPoint1);
+
+    if (includeFirstPoint && includeSecondPoint)
+    {
+        return std::make_pair<Point, Point>(Point(firstFunction, secondFunction, newFirstSymbols),
+                              Point(firstFunction, secondFunction, newSecondSymbols));
+    }
+    else if (not includeFirstPoint && includeSecondPoint)
+    {
+        if (not isDominated({firstPoint}, newPoint2))
+        {
+            return std::make_pair<Point, Point>(Point(firstFunction, secondFunction, secondPoint.getSymbols()),
+                                                Point(firstFunction, secondFunction, newSecondSymbols));
+        }
+        else if (not isDominated({secondPoint}, newPoint2))
+        {
+            return std::make_pair<Point, Point>(Point(firstFunction, secondFunction, firstPoint.getSymbols()),
+                                                Point(firstFunction, secondFunction, newSecondSymbols));
+        }
+    }
+    else if (includeFirstPoint && not includeSecondPoint)
+    {
+        if (not isDominated({firstPoint}, newPoint1))
+        {
+            return std::make_pair<Point, Point>(Point(firstFunction, secondFunction, secondPoint.getSymbols()),
+                                                Point(firstFunction, secondFunction, newFirstSymbols));
+        }
+        else if (not isDominated({secondPoint}, newPoint1))
+        {
+            return std::make_pair<Point, Point>(Point(firstFunction, secondFunction, firstPoint.getSymbols()),
+                                                Point(firstFunction, secondFunction, newFirstSymbols));
+        }
+    }
+
+    return std::make_pair<Point, Point>(Point(firstFunction, secondFunction, firstPoint.getSymbols()),
+                                        Point(firstFunction, secondFunction, secondPoint.getSymbols()));
 }
 
 std::vector<Point> Algorithm::chooseRandomPointsFromSet(const std::vector<Point>& points,
