@@ -121,11 +121,15 @@ void Algorithm::updateConstraints(int row, int column)
     auto symbol = std::string(ui->tableWidget->item(row, 0)->text().toUtf8().constData());
     if(column == 1) // min value changed
     {
-        constraints[symbol].minString = std::string(ui->tableWidget->item(row, 1)->text().toUtf8().constData());
+        auto newValue = std::string(ui->tableWidget->item(row, 1)->text().toUtf8().constData());
+        std::replace(newValue.begin(), newValue.end(), ',', '.');
+        constraints[symbol].minString = newValue;
     }
     else if(column == 2) // max value changed
     {
-        constraints[symbol].maxString = std::string(ui->tableWidget->item(row, 2)->text().toUtf8().constData());
+        auto newValue = std::string(ui->tableWidget->item(row, 2)->text().toUtf8().constData());
+        std::replace(newValue.begin(), newValue.end(), ',', '.');
+        constraints[symbol].maxString = newValue;
     }
 }
 
@@ -156,13 +160,13 @@ void Algorithm::putSymbolsToTable()
 
         try
         {
-            auto* minItem = new QTableWidgetItem(QString::fromStdString(std::to_string(constraints.at(symbol).min)));
+            auto* minItem = new QTableWidgetItem(QString::fromStdString(constraints.at(symbol).minString));
             ui->tableWidget->setItem(i, 1, minItem);
         } catch(std::out_of_range&) {}
 
         try
         {
-            auto* maxItem = new QTableWidgetItem(QString::fromStdString(std::to_string(constraints.at(symbol).max)));
+            auto* maxItem = new QTableWidgetItem(QString::fromStdString(constraints.at(symbol).maxString));
             ui->tableWidget->setItem(i, 2, maxItem);
         } catch(std::out_of_range&) {}
 
