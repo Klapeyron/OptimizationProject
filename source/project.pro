@@ -56,7 +56,8 @@ HEADERS  += \
     muParserTemplateMagic.h \
     muParserTest.h \
     muParserToken.h \
-    muParserTokenReader.h
+    muParserTokenReader.h \
+    mainwindow.h
 
 FORMS    += mainwindow.ui
 
