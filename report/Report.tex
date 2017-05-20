@@ -1,7 +1,6 @@
 \documentclass[11pt]{article}
 	\usepackage[T1]{fontenc}
 	\usepackage[english]{babel}
-	%\usepackage[latin2]{inputenc}
 	\usepackage[utf8]{inputenc}
 	\usepackage{graphicx}
 	\usepackage{float}
@@ -12,26 +11,26 @@
 	\usepackage{listings}
 	\usepackage{color}
 	\usepackage{xspace}
+	\usepackage{multirow}
+	\usepackage{caption}
+	
 	\newcommand{\latex}{\LaTeX\xspace}
-	%\graphicspath{images/lab_1}
+	\graphicspath{images}
 	
 	\pagestyle{fancy}
 	\fancyhead{}
 	\fancyfoot{}
 	\fancyfoot[R]{\thepage}
 	
-%	\textwidth 16cm
 	\textheight 21.0cm
 	\topmargin -0.5cm
-%	\oddsidemargin 0.5cm
-%	\evensidemargin 0.5cm
-%	\def\thefootnote{\arabic{footnote})}
-\setlength{\parindent}{0ex}
-\setlength{\parskip}{1em}
+	
+	\setlength{\parindent}{0ex}
+	\setlength{\parskip}{1em}
 
-\definecolor{mygreen}{rgb}{0,0.6,0}
-\definecolor{mygray}{rgb}{0.5,0.5,0.5}
-\definecolor{mymauve}{rgb}{0.58,0,0.82}
+	\definecolor{mygreen}{rgb}{0,0.6,0}
+	\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+	\definecolor{mymauve}{rgb}{0.58,0,0.82}
 
 \lstset{ %
   backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color}
@@ -51,10 +50,10 @@
 }
 
 \renewcommand{\headrulewidth}{0pt}
-%\renewcommand{\figurename}{Figure}
 			
 \begin{document}
 \setstretch{1.0}
+\renewcommand*\contentsname{Table of contents}
 	%\begin{titlepage}
 	\begin{center}
 		\begin{tabular}{| c | c |}
@@ -84,6 +83,10 @@
 	\end{center}
 	
 	\newpage
+	
+	\tableofcontents
+	
+	\newpage
 
 	\section{Introduction}
 	
@@ -96,16 +99,18 @@
 	
 	\section{Description of the problem}
 	
+	\subsection{Definition of problem}
+		
 	The algorithm solves a bicriterial problem. Here it minimizes system of two
 	functions with M variables.
 	
 	$$\begin{cases}
-		F_{1}(x_{1},x_{2},...,x_{M})\\
-		F_{1}(x_{1},x_{2},...,x_{M})
+		f_{1}(x_{1},x_{2},...,x_{M})\\
+		f_{2}(x_{1},x_{2},...,x_{M})
 	\end{cases}$$
 	
-	Constraints constraints given as an input of algorithm are constraints of
-	variables. So
+	These functions can be either linear or nonlinear. Constraints given as an
+	input of the algorithm are constraints of variables. So:
 	
 	$$\begin{cases}
 		x_{1min} \leq x_{1} \leq x_{1max}\\
@@ -116,45 +121,81 @@
 		x_{Mmin} \leq x_{M} \leq x_{Mmax}\\
 	\end{cases}$$
 	
-	First N random points are being generated using uniform distribution as
-	$P_{0}$.
-	Algorithm iterates over that set of all points and chooses 
 	
-		
-	\section{Estimation of mean and variance}		
-	\subsection{Central limit theorem and law of large numbers}
+	\begin{figure}[H]
+	\caption{The idea of pareto optimal points selected from set of feasible
+	points}
+	\centering
+	\includegraphics[scale=0.8]{pareto_definition}
+	\label{fig:pareto_idea}
+	\end{figure}
 	
-	According to central limit theorem (CLT) adding independent random variable
-	to an experiment results with their sum tending towards normal distribution.
-	It will be shown later.
+	\begin{figure}[H]
+	\caption{The idea of pareto optimal points selected from set of feasible
+	points}
+	\centering
+	\includegraphics[scale=0.8]{comparative_set}
+	\label{fig:pareto_idea}
+	\end{figure}
 	
-	Moreover here it will be shown that law of large numbers (LLN) is true.
-	It says that the more samples there are considered in an experiment closer
-	to expected value the result is.
 	
-	Also what is interesting both theorems (LLN and CLT) are true for any
-	distribution of random variable that is considered. 	
+	\begin{figure}[H]
+	\caption{Application window view}
+	\centering
+	\includegraphics[scale=0.35]{application}
+	\label{fig:app_window}
+	\end{figure}
 	
-	\subsection{Estimation of expected value}
-	
-	Given a set of samples $X={x_{1},\ x_{2},\ ...,\ x_{N}}$ we can estimate
-	its expected value calculating:
-	
-	$$\hat{E}\{X\}=\mu=\frac{1}{N}\sum_{i=1}^{N}x_{i},$$
-	
-	where N is amount of samples in the set.
-	
-	During laboratories it has been tried to prove LLN and CLT by an experiment,
-	so in order to do it a set of samples has been generated using normal
-	distribution and it has been done for many different amount of samples.
-	The result can be seen on figures below.
-	
-%	\begin{figure}[H]
-%	\caption{Plot showing value of expected value and how it depends on
-%		amount of samples in an experiment}
-%	\centering
-%	\includegraphics[scale=0.7]{ex_plot_convergence}
-%	\label{fig:ex_conv}
-%	\end{figure}
+	\begin{enumerate}
+		\item Boxes in which user should write two functions for finding pareto
+			optimal points. Top box will then be recognized as $f_{1}$ when the 
+			bottom box will be recognized as $f_{2}$
+		\item Table that will represent list of variables recognized in functions
+			formulas that should be inserted before. Here a user can define 
+			constraints of those variables writing them in "Min" and "Max" columns.
+		\item Population size $N$ - amount of points that will be generated as
+			($f_{1}$, $f_{2}$)
+		\item Maximum generation $t$ - amount of repeats of whole algorithm
+		\item Crossing probability $p_{c}$ - probability of performing crossing
+			operation on a particular point.
+		\item Mutation probability $p_{m}$ - probability of performing mutating
+			operation on a particular point
+		\item Sigma $\sigma$ - is a parameter that specifies radius of niche. It is
+			distance of a chosen point 
+		\item Amount of points in comparative collection $t_{dom}$
+		\item Start button - clicking on it triggers start of calculations, if
+			functions have been specified as well as all of parameters needed and
+			described in points 1-8. If user will click on Start button before
+			specifying a particular parameter it will have $0$ value by default.
+		\item Table consisting points of pareto - table consisting pareto optimal
+			points with value of $f_{1}$ and $f_{2}$ as well as values of every
+			variable that resulted in generating such values of given functions
+		\item Figure - figure showing pareto optimal points on a plot with
+			coordinate system axis set as: axis of absenteeism being values of
+			$f_{1}$ and axis of ordinates being values of $f_{2}$
+		\item Progress bar showing progress of a testcase run to keep user in
+			knowledge of progress of the calculations.
+			
+		\begin{center}
+		\captionof{table}{Fields possible to fill by a user and their acceptable 
+			values}
+		\begin{tabular}{| c | c | c |}
+			\hline
+			Data field & Data type & Possible values\\ \hline
+			Function & string & Attachment A\\ \hline
+			Variable & string & x1, x2, ..., xm \\ \hline
+			Min constraint & real number & $-1.7e+308 \div 1.7e+308$\\ \hline
+			Max constraint & real number & $-1.7e+308 \div 1.7e+308$\\ \hline
+			Population size $N$ & natural number & $0 \div 2^{31}-1$ \\ \hline
+			Max generations $t$ & natural number & $0 \div 2^{31}-1$ \\ \hline
+			Crossing probability & natural number & $0 \div 100$ \\ \hline
+			Mutation probability & natural number & $0 \div 100$ \\ \hline
+			$\sigma$ & real number & $0 \div 1.7e+308$ \\ \hline
+			$t_{dom}$ & natural number & $0 \div 2^{31}-1$, $t_{dom} \leq N$ \\
+			\hline
+		\end{tabular}			
+		\end{center}
+			
+	\end{enumerate}
 	
 \end{document}
