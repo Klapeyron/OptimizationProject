@@ -97,12 +97,12 @@
 	as configuration parameters by GUI (Graphical User Interface). The result of 
 	algorith has been shown as Pareto chart and table of non-dominated points.
 	
-	\section{Description of the problem}
+	\section{Description of the problem and the solution}
 	
 	\subsection{Definition of problem}
 		
-	The algorithm solves a bicriterial problem. Here it minimizes system of two
-	functions with M variables.
+	The problem is to minimize values of two functions that is provided as system
+	of equations.
 	
 	$$\begin{cases}
 		f_{1}(x_{1},x_{2},...,x_{M})\\
@@ -121,6 +121,15 @@
 		x_{Mmin} \leq x_{M} \leq x_{Mmax}\\
 	\end{cases}$$
 	
+	A property of such problem is that there is no way to find one optimal solution
+	for both functions as usually finding the best solution in order to minimize
+	one function happens to be the worst solution for minimization of the second
+	function. That means that in order to solve the problem Pareto optimal points 
+	have to be found as a set of points that will minimize whole system of two 
+	functions. Pareto can be shown on plot axis of absenteeism being values of
+	one of the functions and axis of ordinates being values of the other one.
+	The idea of Pareto can be shown on Figure \ref{fig:pareto_idea} where red
+	points and a line on which they lay would be optimal in Pareto sense.
 	
 	\begin{figure}[H]
 	\caption{The idea of pareto optimal points selected from set of feasible
@@ -130,14 +139,57 @@
 	\label{fig:pareto_idea}
 	\end{figure}
 	
+	\subsection{Description of NPGA algorithm}
+	
 	\begin{figure}[H]
-	\caption{The idea of pareto optimal points selected from set of feasible
-	points}
+	\caption{Flow chart presenting how the first part of NPGA works}
 	\centering
-	\includegraphics[scale=0.8]{comparative_set}
-	\label{fig:pareto_idea}
+	\includegraphics[scale=0.76]{NP_algorithm}
+	\label{fig:NP_algorithm}
 	\end{figure}
 	
+	To explain how does a subject point become dominated by the comparative set
+	Figure \ref{fig:comparative_set} has been prepared.
+	Let's say that blue points are points that are part of comparative set.
+	They define a field limited by black lines that created stairs in the picture.
+	When two subjects fight to become part of an optimal solution it is checked
+	which one is part of these field. Figure \ref{fig:comparative_set} shows that
+	for this example green point defined as one of the fighting subjects is
+	part of field defined by comparative set. In resutl it becomes dominated by
+	the comparative set and loses the fight. As a result red point defined as the
+	other fighting subject wins the fight and joins set of non-dominated points.
+	
+	\begin{figure}[H]
+	\caption{Defining field for which points are dominated be a comparative set}
+	\centering
+	\includegraphics[scale=0.8]{comparative_set}
+	\label{fig:comparative_set}
+	\end{figure}
+	
+	There can be an occurence when none of fighting subjects wins this fight by
+	being dominative to comparative set. In such case another criterion shall be
+	applied. For Niched Pareto Genetic Algorithm it is checking whether a point
+	satisfies niche radius criterion.
+	It introduces a parameter of the algorithm called niche radius $\sigma$.
+	That parameter is used to define parameter $D$ for both fighting subjects
+	$pf_{1}$ and $pf_{2}$. D will be defined as:
+	$$D=\sum_{i=1}^{K}\boldsymbol{1}_{<pf,p_{i}>\ <\ \sigma}$$
+	So it means that $D$ is amount of points from comparative set that is closer to
+	a fighting point $pf$ than $\sigma$.
+	
+	In the end $D$s of both fighting points are being compared and a point with
+	larger $D$ parameter is being added to set of non-dominated points.
+	In case of both points $D$ parameters being equal the first subject is being
+	added to non-dominated set.
+	
+	\begin{figure}[H]
+	\caption{Flow chart presenting how the first part of NPGA works}
+	\centering
+	\includegraphics[scale=0.8]{GA_algorithm}
+	\label{fig:GA_algorithm}
+	\end{figure}
+	
+	\section{Application}
 	
 	\begin{figure}[H]
 	\caption{Application window view}
@@ -175,27 +227,123 @@
 			$f_{1}$ and axis of ordinates being values of $f_{2}$
 		\item Progress bar showing progress of a testcase run to keep user in
 			knowledge of progress of the calculations.
-			
-		\begin{center}
-		\captionof{table}{Fields possible to fill by a user and their acceptable 
-			values}
-		\begin{tabular}{| c | c | c |}
-			\hline
-			Data field & Data type & Possible values\\ \hline
-			Function & string & Attachment A\\ \hline
-			Variable & string & x1, x2, ..., xm \\ \hline
-			Min constraint & real number & $-1.7e+308 \div 1.7e+308$\\ \hline
-			Max constraint & real number & $-1.7e+308 \div 1.7e+308$\\ \hline
-			Population size $N$ & natural number & $0 \div 2^{31}-1$ \\ \hline
-			Max generations $t$ & natural number & $0 \div 2^{31}-1$ \\ \hline
-			Crossing probability & natural number & $0 \div 100$ \\ \hline
-			Mutation probability & natural number & $0 \div 100$ \\ \hline
-			$\sigma$ & real number & $0 \div 1.7e+308$ \\ \hline
-			$t_{dom}$ & natural number & $0 \div 2^{31}-1$, $t_{dom} \leq N$ \\
-			\hline
-		\end{tabular}			
-		\end{center}
-			
 	\end{enumerate}
+			
+	\begin{center}
+	\captionof{table}{Fields possible to fill by a user and their acceptable 
+		values}
+	\begin{tabular}{| c | c | c |}
+		\hline
+		\textbf{Data field} & \textbf{Data type} & \textbf{Possible values}\\
+		\hline
+		Function & string & Attachment A\\ \hline
+		Function Variables & string & x1, x2, ..., xm \\ \hline
+		Min constraint & real number & $-1.7e+308 \div 1.7e+308$\\ \hline
+		Max constraint & real number & $-1.7e+308 \div 1.7e+308$\\ \hline
+		Population size $N$ & natural number & $0 \div 2^{31}-1$ \\ \hline
+		Max generations $t$ & natural number & $0 \div 2^{31}-1$ \\ \hline
+		Crossing probability & natural number & $0 \div 100$ \\ \hline
+		Mutation probability & natural number & $0 \div 100$ \\ \hline
+		$\sigma$ & real number & $0 \div 1.7e+308$ \\ \hline
+		$t_{dom}$ & natural number & $0 \div 2^{31}-1$, $t_{dom} \leq N$ \\
+		\hline
+	\end{tabular}			
+	\end{center}
+	
+	\newpage
+	\section{Application test}
+	
+	\begin{enumerate}
+	
+	\item Schaffer function
+	$$\begin{cases}
+		f_{1}(x)=x_{1}^{2}\\
+		f_{2}(x)=(x_{1}-2)^{2}
+	\end{cases}$$
+		
+	Constraints: $-A \leq x1 \leq A$, where A is $10 \leq A \leq 10^{5}$
+		
+	\begin{figure}[H]
+	\caption{Figure of pareto optimal solutions of Schaffer function}
+	\centering
+	\includegraphics[scale=0.5]{schaffer}
+	\label{fig:schaffer}
+	\end{figure}
+	
+	\end{enumerate}
+	
+	\newpage	
+	\section*{Attachment A}
+	
+	\begin{center}
+	\captionof{table}{Fields possible to fill by a user and their acceptable 
+		values}
+	\begin{tabular}{| c | c | c |}
+		\hline
+		\textbf{Symbol} & \textbf{Amount of arguments} & \textbf{Function}\\ \hline
+		sin & 1 & sine\\ \hline
+		cos & 1 & cosine\\ \hline
+		tan & 1 & tangent\\ \hline
+		asin & 1 & arcsine\\ \hline
+		acos & 1 & arccosine\\ \hline
+		atan & 1 & arctangent\\ \hline
+		sinh & 1 & hyperbolic sine\\ \hline
+		cosh & 1 & hyperbolic cosine \\ \hline
+		tanh & 1 & hyperbolic arctangent\\ \hline
+		asinh & 1 & hyperbolic arcsine\\ \hline
+		acosh & 1 & hyperbolic arccosine \\ \hline
+		atanh & 1 & hyperbolic arctangent\\ \hline
+		log2 & 1 & logarithm of base 2\\ \hline
+		log10 & 1 & logarithm of base 10 \\ \hline
+		log & 1 & logarithm of base 10\\ \hline
+		ln & 1 & logarithm of base e\\ \hline
+		exp & 1 & e in power of x\\ \hline
+		sqrt & 1 & square root\\ \hline
+		sign & 1 & signum\\ \hline
+		rint & 1 & round-off to integer\\ \hline
+		abs & 1 & absolute value of x\\ \hline
+		min & varying & minimum of set\\ \hline
+		max & varying & maximum of set\\ \hline
+		sum & varying & sum of set\\ \hline
+		avg & varying & mean of set\\
+		\hline
+	\end{tabular}			
+	\end{center}
+	
+	\newpage	
+	\begin{center}
+	\captionof{table}{Fields possible to fill by a user and their acceptable 
+		values}
+	\begin{tabular}{| c | c | c |}
+		\hline
+		\textbf{Operator} & \textbf{Description} & \textbf{Priority}\\ \hline
+		= & assignment & -1\\ \hline
+		\&\& & logical and & -1\\ \hline
+		|| & logical or & 2\\ \hline
+		<= & less or equal & 4\\ \hline
+		>= & greater or equal & 4\\ \hline
+		!= & not equal & 4\\ \hline
+		== & equal & 4\\ \hline
+		< & less than & 4\\ \hline
+		> & greater than & 4\\ \hline
+		+ & addition & 5\\ \hline
+		- & subtraction & 5\\ \hline
+		* & multiplication & 6\\ \hline
+		/ & division & 6\\ \hline
+		\^{} & raise of x to the power of y & 7\\
+		\hline
+	\end{tabular}			
+	\end{center}
+	
+	\newpage
+	\section{References}
+	
+	\begin{enumerate}
+		\item http://staff.iiar.pwr.wroc.pl/ewa.szlachcic/materialy\%
+		20dydaktyczne/air\_ studia\_ 2\_ stopnia/metody\_ optymalizacji\_ wielokryterialnej\_ Mlynek.pdf
+		\item MuParser main page: http://beltoforion.de/article.php?a=muparser
+		\item http://beltoforion.de/article.phpa=muparser \& hl=en\& p=features\& s=idDef2\# idDef2
+	\end{enumerate}
+		
 	
 \end{document}
