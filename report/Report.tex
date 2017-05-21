@@ -224,6 +224,8 @@
 	\label{fig:app_window}
 	\end{figure}
 	
+	\subsection{Interface description}	
+	
 	\begin{enumerate}
 		\item Boxes in which user should write two functions for finding pareto
 			optimal points. Top box will then be recognized as $f_{1}$ when the 
@@ -254,7 +256,9 @@
 		\item Progress bar showing progress of a testcase run to keep user in
 			knowledge of progress of the calculations.
 	\end{enumerate}
-			
+
+	\subsection{Constraints on data input}
+
 	\begin{center}
 	\captionof{table}{Fields possible to fill by a user and their acceptable 
 		values}
@@ -275,6 +279,22 @@
 		\hline
 	\end{tabular}			
 	\end{center}
+	
+	\subsection{Data validation and self-protection}
+	Application contains basic mechanisms of input data validation. Following informations are verified:
+	\begin{itemize}
+		\item Symbol column in constrains table and cells in table with non-dominated results are write protected.
+		\item Comas used in double digit representation are automatically replaced into dots.
+		\item If minimal value for any symbol in constraints table is greater than maximal value, error presented on Figure \ref{fig:constraints} is shown.
+		\item Application allows to write percentage values smaller than 0 and greater than 100. In both cases invalid values are interpreted respectively as 0 and 100 percent.
+	\end{itemize}		
+			
+	\begin{figure}[H]
+	\caption{Window with information about invalid constraints for \textit{x1} symbol}
+	\centering
+	\includegraphics[scale=0.8]{constraints.png}
+	\label{fig:constraints}
+	\end{figure}	
 	
 	\newpage
 	\section{Application tests}
