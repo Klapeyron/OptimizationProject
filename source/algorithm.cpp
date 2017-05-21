@@ -496,7 +496,7 @@ void Algorithm::startCalculations()
 
     for (unsigned t = 0; t < T; ++t)
     {
-        printPoints(p0);
+        // printPoints(p0);
         std::vector<Point> temporarySet;
 
         for(std::size_t i = 0; i < N; i++)
@@ -530,11 +530,6 @@ void Algorithm::startCalculations()
             }
         }
 
-//        std::sort(temporarySet.begin(), temporarySet.end(),
-//                  [](Point const& left, Point const& right)
-//        {
-//            return left.getXValue() < right.getXValue();
-//        });
         std::vector<Point> crossoverSet;
 
         for(std::size_t i = 0; i < std::floor(N/2); i++)
