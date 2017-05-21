@@ -469,6 +469,8 @@ void Algorithm::tabularizePoints(std::vector<Point>& points)
 
 void Algorithm::startCalculations()
 {
+    try
+    {
     for (auto& constraint : constraints)
     {
         if(not constraint.second.calculateConstraints())
@@ -599,4 +601,17 @@ void Algorithm::startCalculations()
     printPoints(pointsToPrint);
     ui->progressBar->setValue(100);
     tabularizePoints(pointsToPrint);
+    }
+    catch(mu::Parser::exception_type& e)
+    {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Invalid function");
+        msgBox.setText("Invalid function: " + QString::fromStdString(e.GetMsg()));
+        msgBox.exec();
+        return;
+    }
+    catch(...)
+    {
+        return;
+    }
 }
