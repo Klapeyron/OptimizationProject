@@ -1,5 +1,4 @@
-\documentclass[11pt]{article}
-	\usepackage[T1]{fontenc}
+\documentclass[a4paper, 11pt]{article}
 	\usepackage[english]{babel}
 	\usepackage[utf8]{inputenc}
 	\usepackage{graphicx}
@@ -7,13 +6,13 @@
 	\usepackage{amsfonts, amsmath}
 	\usepackage{fancyhdr}
 	\usepackage{setspace}
-	\usepackage{epstopdf}
 	\usepackage{listings}
 	\usepackage{color}
 	\usepackage{xspace}
 	\usepackage{multirow}
 	\usepackage{caption}
 	\usepackage{url}
+    \usepackage{hyperref}
 
 	\newcommand{\latex}{\LaTeX\xspace}
 	\graphicspath{images}
@@ -94,9 +93,9 @@
 	The aim of the project was to implement an optimization algorithm of non-linear
 	bicriterial problem. Niched-Pareto Genetic Algorithm (NPGA) \cite{OptymailzacjaWielokryterialna} has been used to
 	solve this problem. Whole program has been implemented in C++ using QT 	
-	framework and allows user to provide functions to optimize as well 
+	framework \cite{Qt} and allows user to provide functions to optimize as well 
 	as configuration parameters by GUI (Graphical User Interface). An external
-	library called muParser has been used to fulfill a functionality of
+	library called muParser \cite{MuParser} has been used to fulfill a functionality of
 	function parsing .The result of algorithm has been shown as Pareto chart and
 	table of non-dominated points.
 	
@@ -365,7 +364,7 @@
 	
 	\begin{center}
 	\captionof{table}{Fields possible to fill by a user and their acceptable 
-		values \cite{MuParser}}
+		values \cite{MuParserFeatures}}
 	\begin{tabular}{| c | c | c |}
 		\hline
 		\textbf{Symbol} & \textbf{Amount of arguments} & \textbf{Function}\\ \hline
@@ -401,7 +400,7 @@
 	\newpage	
 	\begin{center}
 	\captionof{table}{Fields possible to fill by a user and their acceptable 
-		values \cite{MuParser}}
+		values \cite{MuParserFeatures}}
 	\begin{tabular}{| c | c | c |}
 		\hline
 		\textbf{Operator} & \textbf{Description} & \textbf{Priority}\\ \hline
@@ -424,6 +423,8 @@
 	\end{center}
 	
 	\newpage
+
+    \addcontentsline{toc}{section}{References}
 
 	\bibliography{bibliography}{}
 	\bibliographystyle{plain}
