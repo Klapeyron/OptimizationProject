@@ -98,11 +98,13 @@
 	\section{Introduction}
 	
 	The aim of the project was to implement an optimization algorithm of non-linear
-	bicriterial problem. Niched-Pareto Genetic Algorithm (NPGA) \cite{OptymailzacjaWielokryterialna} has been used to
+	bicriterial problem. Niched-Pareto Genetic Algorithm (NPGA) 
+	\cite{OptymailzacjaWielokryterialna} has been used to
 	solve this problem. Whole program has been implemented in C++ using QT 	
 	framework \cite{Qt} and allows user to provide functions to optimize as well 
 	as configuration parameters by GUI (Graphical User Interface). An external
-	library called muParser \cite{MuParser} has been used to fulfill a functionality of
+	library called muParser \cite{MuParser} has been used to fulfill a 
+	functionality of
 	function parsing .The result of algorithm has been shown as Pareto chart and
 	table of non-dominated points.
 	
@@ -143,8 +145,9 @@
 	\begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.8]{pareto_definition}
-	\caption{The idea of pareto optimal points selected from set of feasible points}
 	\label{fig:pareto_idea}
+	\caption{The idea of pareto optimal points selected from set of feasible 
+		points}
 	\end{figure}
 	
 	\subsection{Description of NPGA algorithm}
@@ -169,7 +172,7 @@
 	
 	\begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.8]{comparative_set}
+	\includegraphics[scale=0.75]{comparative_set}
 	\caption{Defining field for which points are dominated be a comparative set}
 	\label{fig:comparative_set}
 	\end{figure}
@@ -181,7 +184,7 @@
 	It introduces a parameter of the algorithm called niche radius $\sigma$.
 	That parameter is used to define parameter $D$ for both fighting subjects
 	$pf_{1}$ and $pf_{2}$. D will be defined as:
-	$$D=\sum_{i=1}^{K}\boldsymbol{1}_{<pf,p_{i}>\ <\ \sigma}$$
+	$$D=\sum_{i=1}^{K}\boldsymbol{1}_{\{<pf,p_{i}>\ <\ \sigma\}}$$
 	So it means that $D$ is amount of points from comparative set that is closer to
 	a fighting point $pf$ than $\sigma$.
 	
@@ -193,14 +196,15 @@
 	\begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.8]{GA_algorithm}
-	\caption{Flow chart presenting how the second part of NPGA works (the part that is related to genetic evolution)}
+	\caption{Flow chart presenting how the second part of NPGA works (the part that 
+		is related to genetic evolution)}
 	\label{fig:GA_algorithm}
 	\end{figure}
 	
 	Crossing over the subjects comes from theory of genetics where children inherit
 	mixed traits and genes from their parents. Here traits of a subject would be
-	values of particular variables and it is chosen randomly what value will a child
-	inherit. For example if parent points are:
+	values of particular variables and it is chosen randomly what value will a 
+	child inherit. For example if parent points are:
 	$$(f_{1}(x), f_{2}(x)),\ x=(x_{11}, x_{21}, x_{31})$$
 	$$(f_{1}(x'), f_{2}(x')),\ x'=(x_{12}, x_{22}, x_{32})$$
 	
