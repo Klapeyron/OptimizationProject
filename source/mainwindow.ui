@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Niched Pareto Genetic Algorithm (NPGA) - Tomasz Bartos, Radosław Zwolski</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QPushButton" name="startButton">
@@ -46,7 +46,7 @@
       <x>20</x>
       <y>20</y>
       <width>541</width>
-      <height>64</height>
+      <height>66</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
@@ -242,7 +242,7 @@
      <x>0</x>
      <y>0</y>
      <width>1072</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>
