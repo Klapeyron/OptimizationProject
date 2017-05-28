@@ -13,6 +13,7 @@
 	\usepackage{caption}
 	\usepackage{url}
     \usepackage{hyperref}
+    \usepackage{subfig}
 
 	\newcommand{\latex}{\LaTeX\xspace}
 	\graphicspath{images}
@@ -322,7 +323,7 @@
 	\label{fig:schaffer}
 	\end{figure}
 	
-	\subsection{Binh and Korn function}
+	\subsection{Binh and Korn function} \label{BinhAndKorn}
 	$$\begin{cases}
 		f_{1}(x)=4x_{1}^{2}+4x_{2}^{2}\\
 		f_{2}(x)=(x_{1}-5)^{2}+(x_{2}-5)^{2}
@@ -359,6 +360,40 @@
 	\caption{Figure of pareto optimal solutions of CTP1 function}
 	\label{fig:ctp1}
 	\end{figure}
+
+	\newpage
+	\section{Influence of Niched-Pareto parameters}
+	Algorithm depends on parameters from genetic part, which are known as \textit{Crossing probability} and \textit{Mutation probability}. Furthermore, there are two additional parameters from \textit{Niched-Pareto} part, which are \textit{Niche radius $sigma$} and \textit{tdom}, representing number of points taken during domination step.
+	Influence of input parameters for NPGA algorithm have been verified on example of \textit{Binh and Korn} presented in Section \ref{BinhAndKorn}.
+	
+	Experimental has been verified, that $\sigma$ parameter should be selected as $\frac{1}{4}$ of range of shorter axis. In particular case, range of x axis was $[0,120]$ and y axis $[0,50]$. It means, that $\sigma$ should be chosen as $\frac{1}{4}*50=12$. Result for $\sigma$ equal 12 has been presented on Figure \ref{fig:sigmaInfluence}. As can be seen, arrangement of non-dominated points is uniform, which has not been reached for $sigma=100$ presented on Figure \ref{fig:sigmaInfluenceHighValue}. Higher values influence convergence to local minimums, which are located in particular case near point $[35,30]$ and $[100,25]$. Smaller value of $\sigma$ make strong convergence into one of directions, which are in this example near left and upper part of figure. Results for $\sigma=1$ has been shown on Figure \ref{fig:sigmaInfluenceLowValue}.
+	
+    \begin{figure}[H]
+        \centering
+        \subfloat[All points]{{\includegraphics[width=5.75cm]{sigmaInfluence.png} }}
+        \qquad
+        \subfloat[Non-dominated points]{{\includegraphics[width=5.75cm]{sigmaInfluencePareto.png} }}
+        \caption{Figure of pareto and all point for experimentaly chosen $\sigma$ as 12}
+        \label{fig:sigmaInfluence}
+    \end{figure}
+	
+	\begin{figure}[H]
+        \centering
+        \subfloat[All points]{{\includegraphics[width=5.75cm]{sigmaInfluenceHighValue.png} }}
+        \qquad
+        \subfloat[Non-dominated points]{{\includegraphics[width=5.75cm]{sigmaInfluenceHighValuePareto.png} }}
+        \caption{Figure of pareto and all point for experimentaly chosen $\sigma$ as 100}
+        \label{fig:sigmaInfluenceHighValue}
+    \end{figure}
+
+	\begin{figure}[H]
+        \centering
+        \subfloat[All points]{{\includegraphics[width=5.75cm]{sigmaInfluenceLowValue.png} }}
+        \qquad
+        \subfloat[Non-dominated points]{{\includegraphics[width=5.75cm]{sigmaInfluenceLowValuePareto.png} }}
+        \caption{Figure of pareto and all point for experimentaly chosen $\sigma$ as 1}
+        \label{fig:sigmaInfluenceLowValue}
+    \end{figure}
 
 	\newpage
 
